@@ -1,0 +1,49 @@
+Benchmarking is an experimental feature.
+Breaking changes might not follow SemVer, please pin Vitest's version when using it.
+
+ RUN  v3.2.4 /Users/xuemian/SynologyDrive/USYD/home_proj
+
+
+ ✓ src/__tests__/benchmark.bench.ts > Chunker Benchmarks 2424ms
+     name                          hz     min     max    mean     p75     p99    p995    p999     rme  samples
+   · chunk 10-page tender   13,697.51  0.0692  0.4250  0.0730  0.0710  0.1972  0.2240  0.2742  ±0.58%     6849
+   · chunk 50-page tender    2,715.45  0.3425  3.7858  0.3683  0.3518  0.6473  1.6308  2.5911  ±2.19%     1358
+   · chunk 100-page tender   1,399.43  0.6825  1.4163  0.7146  0.7099  0.9104  0.9583  1.4163  ±0.60%      700
+   · chunk 200-page tender     707.44  1.3646  1.6778  1.4136  1.4180  1.6507  1.6628  1.6778  ±0.53%      354
+
+ ✓ src/__tests__/benchmark.bench.ts > Vector Store Benchmarks 4058ms
+     name                                              hz      min      max     mean      p75      p99     p995     p999     rme  samples
+   · upsert 100 vectors (3072-dim)                64.7635  15.0581  15.8811  15.4408  15.5101  15.8811  15.8811  15.8811  ±0.33%       33
+   · query top-5 from 100 vectors                 61.7391  16.0359  16.7314  16.1972  16.2253  16.7314  16.7314  16.7314  ±0.28%       31
+   · query top-5 from 500 vectors                 12.1804  80.3109  84.8076  82.0994  84.2036  84.8076  84.8076  84.8076  ±1.57%       10
+   · query with metadata filter from 500 vectors  12.5700  78.6250  81.9987  79.5545  79.7361  81.9987  81.9987  81.9987  ±0.98%       10
+
+ BENCH  Summary
+
+  chunk 10-page tender - src/__tests__/benchmark.bench.ts > Chunker Benchmarks
+    5.04x faster than chunk 50-page tender
+    9.79x faster than chunk 100-page tender
+    19.36x faster than chunk 200-page tender
+
+  upsert 100 vectors (3072-dim) - src/__tests__/benchmark.bench.ts > Vector Store Benchmarks
+    1.05x faster than query top-5 from 100 vectors
+    5.15x faster than query with metadata filter from 500 vectors
+    5.32x faster than query top-5 from 500 vectors
+
+
+ RUN  v3.2.4 /Users/xuemian/SynologyDrive/USYD/home_proj
+
+No test files found, exiting with code 1
+
+filter: src/__tests__/benchmark.bench.ts
+include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*
+
+Document Size → Chunk Count (Token Savings vs Full-Text)
+═══════════════════════════════════════════════════════════════════════════════
+   10 pages |    25,568 chars |   15 chunks | No-RAG: ~ 12,784 tokens | RAG: ~24,000 tokens | -88% saved
+   50 pages |   127,153 chars |   79 chunks | No-RAG: ~ 63,578 tokens | RAG: ~32,000 tokens | 50% saved
+  100 pages |   254,253 chars |  157 chunks | No-RAG: ~127,128 tokens | RAG: ~32,000 tokens | 75% saved
+  200 pages |   508,075 chars |  313 chunks | No-RAG: ~254,038 tokens | RAG: ~32,000 tokens | 87% saved
+(node:47025) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
