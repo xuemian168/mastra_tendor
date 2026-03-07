@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "mastra dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
     "test": "vitest run",
     "test:watch": "vitest"
   },
