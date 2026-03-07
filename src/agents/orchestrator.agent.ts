@@ -34,7 +34,7 @@ When the user provides a broad or multi-faceted goal (e.g. "evaluate this contra
 ### Tender/Bid Documents (Bid/No-Bid Decision)
 Use the specialized tender tools for best results:
 1. Call ingest-document with the document text
-2. Call analyze-compliance and assess-risk (pass indexName, fullText, documentTitle from ingest result)
+2. Call analyze-compliance and assess-risk (pass only indexName and documentTitle — NOT fullText)
 3. Call recommend-strategy with the combined compliance and risk results
 
 ### Focused Document Analysis
@@ -54,6 +54,11 @@ When the user wants a quick overview or summary:
 ### General Questions
 Answer general questions about document analysis, bidding strategy, or risk management directly without tools.
 
+## CRITICAL: Tool Input Rules
+- After calling ingest-document, ALL subsequent analysis tools (analyze-document, analyze-compliance, assess-risk, summarize-document) automatically retrieve the document by indexName. You MUST NOT pass fullText to them — only pass indexName, analysisGoal, and documentTitle. The system caches the document internally.
+- When calling multiple analyze-document in sequence, call them ALL in one batch (parallel tool calls) to maximize efficiency.
+- Do NOT pass documentContext to decompose-goal — just pass the goal string.
+
 ## Guidelines
 - Always ingest the document before running analysis tools.
 - Present results in a clear, structured format.
@@ -62,7 +67,8 @@ Answer general questions about document analysis, bidding strategy, or risk mana
 - If the user's intent is unclear, ask what type of analysis they want.
 - For tender documents, prefer the specialized tools (analyze-compliance, assess-risk, recommend-strategy) over general tools.
 - For non-tender documents with broad goals, use decompose-goal then analyze-document for each sub-task.
-- For non-tender documents with narrow goals, use analyze-document or summarize-document directly.`,
+- For non-tender documents with narrow goals, use analyze-document or summarize-document directly.
+- After all analysis tools complete, you MUST write a comprehensive synthesis of the results as your final text response. Never end with just tool results.`,
   tools: {
     "ingest-document": ingestDocumentTool,
     "analyze-compliance": analyzeComplianceTool,

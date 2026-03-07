@@ -5,19 +5,39 @@ import {
   generateId,
 } from "ai";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const MASTRA_URL = process.env.MASTRA_URL || "http://localhost:4111";
 
 export async function POST(req: Request) {
   const body = await req.json();
 
+  // Convert UIMessage format (parts) to CoreMessage format (content) for Mastra
+  const rawMessages = body.messages ?? [];
+  const messages = rawMessages.map((msg: Record<string, unknown>) => {
+    // Already has content — pass through
+    if (typeof msg.content === "string") return msg;
+    // UIMessage format: extract text from parts array
+    const parts = msg.parts as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(parts)) {
+      const text = parts
+        .filter((p) => p.type === "text")
+        .map((p) => p.text)
+        .join("\n");
+      return { role: msg.role, content: text };
+    }
+    return msg;
+  });
+
   // Inject company profile as a system message if provided by the frontend
-  const messages = body.messages ?? [];
   if (body.system) {
     messages.unshift({ role: "system", content: body.system });
   }
-  const mastraBody = { ...body, messages };
+
+  // Only forward fields Mastra needs — do NOT spread the full browser body
+  // (browser sends 'system', 'tools', 'id', 'trigger', 'metadata' which can
+  // override the agent's instructions or tools configuration)
+  const mastraBody = { messages, maxSteps: body.maxSteps ?? 10 };
 
   const stream = createUIMessageStream({
     execute: async ({ writer }) => {
@@ -149,32 +169,52 @@ function forwardJsonChunk(
 ) {
   const type = chunk.type as string;
   const payload = chunk.payload as Record<string, unknown> | undefined;
-
   switch (type) {
-    // Mastra format: payload.text contains the delta text
-    case "text-delta":
+    // Text lifecycle: text-start → text-delta(s) → text-end
+    // AI SDK requires text-start before any text-delta with matching id
+    case "text-start": {
+      const id = (payload?.id ?? chunk.id ?? generateId()) as string;
+      writer.write({ type: "text-start", id });
+      break;
+    }
+    case "text-delta": {
+      const id = (payload?.id ?? chunk.id ?? generateId()) as string;
       writer.write({
         type: "text-delta",
         delta: (payload?.text ?? chunk.textDelta ?? chunk.delta ?? "") as string,
-        id: generateId(),
+        id,
       });
       break;
+    }
+    case "text-end": {
+      const id = (payload?.id ?? chunk.id ?? generateId()) as string;
+      writer.write({ type: "text-end", id });
+      break;
+    }
+    // Tool events
     case "tool-call":
+    case "tool-input-available":
       writer.write({
         type: "tool-input-available",
         toolCallId: (payload?.toolCallId ?? chunk.toolCallId) as string,
         toolName: (payload?.toolName ?? chunk.toolName) as string,
-        input: payload?.args ?? chunk.args,
+        input: payload?.args ?? chunk.args ?? chunk.input,
       });
       break;
     case "tool-result":
+    case "tool-output-available":
       writer.write({
         type: "tool-output-available",
         toolCallId: (payload?.toolCallId ?? chunk.toolCallId) as string,
-        output: payload?.result ?? chunk.result,
+        output: payload?.result ?? chunk.result ?? chunk.output,
       });
       break;
+    // Step lifecycle
+    case "step-start":
+      writer.write({ type: "start-step" });
+      break;
     case "step-finish":
+    case "finish-step":
       writer.write({ type: "finish-step" });
       break;
     case "finish":
@@ -188,8 +228,9 @@ function forwardJsonChunk(
       break;
     // Mastra-specific types we can safely ignore
     case "start":
-    case "text-start":
-    case "text-end":
+    case "tool-call-input-streaming-start":
+    case "tool-call-input-streaming-end":
+    case "tool-call-delta":
       break;
   }
 }

@@ -5,6 +5,7 @@ import {
   ComposerPrimitive,
   MessagePrimitive,
 } from "@assistant-ui/react";
+import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 import { ToolCallDisplay } from "./tool-call-display";
 
 export function ChatUI() {
@@ -78,6 +79,7 @@ function AssistantMessage() {
       <div className="max-w-[80%] rounded-xl bg-[var(--muted)] px-4 py-3 text-sm prose prose-sm dark:prose-invert">
         <MessagePrimitive.Content
           components={{
+            Text: () => <MarkdownTextPrimitive />,
             tools: {
               Fallback: ToolCallDisplay,
             },

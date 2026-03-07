@@ -25,14 +25,15 @@ export const decomposeGoalTool = createTool({
     documentContext: z
       .string()
       .optional()
-      .describe("Brief description of the document type, if known"),
+      .describe("Short label of the document type (e.g. 'software license agreement', 'consulting contract'). Do NOT paste the full document text here."),
   }),
   execute: async (inputData) => {
-    const contextHint = inputData.documentContext
-      ? `\nDocument type: ${inputData.documentContext}`
-      : "";
+    try {
+      const contextHint = inputData.documentContext
+        ? `\nDocument type: ${inputData.documentContext}`
+        : "";
 
-    const prompt = `You are a task decomposition specialist. Given a broad analysis goal, break it down into 3-6 focused, non-overlapping sub-tasks that together cover the goal comprehensively.
+      const prompt = `You are a task decomposition specialist. Given a broad analysis goal, break it down into 3-6 focused, non-overlapping sub-tasks that together cover the goal comprehensively.
 
 Goal: ${inputData.goal}${contextHint}
 
@@ -42,18 +43,24 @@ Rules:
 - Order sub-tasks logically (foundational analysis first, synthesis last)
 - Keep each analysisGoal concise (1-2 sentences)`;
 
-    const result = await generalAnalystAgent.generate(prompt, {
-      structuredOutput: { schema: decomposeOutputSchema },
-    });
+      const result = await generalAnalystAgent.generate(prompt, {
+        structuredOutput: { schema: decomposeOutputSchema },
+      });
 
-    if (result.usage) {
-      tokenTracker.record(
-        "decompose-goal-tool",
-        result.usage.promptTokens,
-        result.usage.completionTokens,
-      );
+      if (result.usage) {
+        tokenTracker.record(
+          "decompose-goal-tool",
+          result.usage.promptTokens,
+          result.usage.completionTokens,
+        );
+      }
+
+      return result.object;
+    } catch (error) {
+      return {
+        error: true,
+        message: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
+      };
     }
-
-    return result.object;
   },
 });

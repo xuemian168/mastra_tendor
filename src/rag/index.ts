@@ -9,3 +9,4 @@ export {
   type RetrievalConfig,
 } from "./retriever.js";
 export { HistoryStore, historyStore } from "./history-store.js";
+export { documentCache } from "./document-cache.js";

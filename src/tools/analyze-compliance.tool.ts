@@ -7,6 +7,7 @@ import { tokenTracker } from "../utils/token-tracker.js";
 import { vectorStore } from "../rag/in-memory-vector-store.js";
 import { retrieveForAgent, COMPLIANCE_RETRIEVAL_CONFIG } from "../rag/retriever.js";
 import { embedQuery } from "../rag/embedder.js";
+import { documentCache } from "../rag/document-cache.js";
 
 export const analyzeComplianceTool = createTool({
   id: "analyze-compliance",
@@ -16,39 +17,50 @@ export const analyzeComplianceTool = createTool({
   inputSchema: z.object({
     indexName: z.string().describe("The indexName returned by ingest-document"),
     documentTitle: z.string().optional(),
-    fullText: z.string().optional().describe("Full text if document was below RAG threshold"),
+    fullText: z.string().optional().describe("DEPRECATED: Do not pass. The system retrieves document text automatically by indexName."),
   }),
   execute: async (inputData) => {
-    let prompt: string;
+    try {
+      let prompt: string;
 
-    if (inputData.fullText) {
-      prompt = buildTenderPrompt(
-        "Analyze the following document for compliance requirements.",
-        inputData.fullText,
-        inputData.documentTitle,
-      );
-    } else {
-      const chunks = await retrieveForAgent(
-        vectorStore,
-        inputData.indexName,
-        COMPLIANCE_RETRIEVAL_CONFIG,
-        embedQuery,
-      );
-      prompt = buildRagPrompt(
-        "Analyze the following document for compliance requirements.",
-        chunks,
-        inputData.documentTitle,
-      );
+      const cached = documentCache.get(inputData.indexName);
+      const fullText = inputData.fullText ?? cached?.fullText;
+      const docTitle = inputData.documentTitle ?? cached?.documentTitle;
+
+      if (fullText) {
+        prompt = buildTenderPrompt(
+          "Analyze the following document for compliance requirements.",
+          fullText,
+          docTitle,
+        );
+      } else {
+        const chunks = await retrieveForAgent(
+          vectorStore,
+          inputData.indexName,
+          COMPLIANCE_RETRIEVAL_CONFIG,
+          embedQuery,
+        );
+        prompt = buildRagPrompt(
+          "Analyze the following document for compliance requirements.",
+          chunks,
+          docTitle,
+        );
+      }
+
+      const result = await complianceAgent.generate(prompt, {
+        structuredOutput: { schema: complianceOutputSchema },
+      });
+
+      if (result.usage) {
+        tokenTracker.record("compliance-tool", result.usage.promptTokens, result.usage.completionTokens);
+      }
+
+      return result.object;
+    } catch (error) {
+      return {
+        error: true,
+        message: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
+      };
     }
-
-    const result = await complianceAgent.generate(prompt, {
-      structuredOutput: { schema: complianceOutputSchema },
-    });
-
-    if (result.usage) {
-      tokenTracker.record("compliance-tool", result.usage.promptTokens, result.usage.completionTokens);
-    }
-
-    return result.object;
   },
 });

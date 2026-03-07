@@ -64,14 +64,21 @@ export const recommendStrategyTool = createTool({
       // History retrieval is best-effort
     }
 
-    const result = await strategyAgent.generate(prompt, {
-      structuredOutput: { schema: strategyOutputSchema },
-    });
+    try {
+      const result = await strategyAgent.generate(prompt, {
+        structuredOutput: { schema: strategyOutputSchema },
+      });
 
-    if (result.usage) {
-      tokenTracker.record("strategy-tool", result.usage.promptTokens, result.usage.completionTokens);
+      if (result.usage) {
+        tokenTracker.record("strategy-tool", result.usage.promptTokens, result.usage.completionTokens);
+      }
+
+      return result.object;
+    } catch (error) {
+      return {
+        error: true,
+        message: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
+      };
     }
-
-    return result.object;
   },
 });

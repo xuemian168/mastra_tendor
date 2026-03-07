@@ -4,6 +4,7 @@ import { chunkTenderDocument } from "../rag/chunker.js";
 import { embedTexts } from "../rag/embedder.js";
 import { vectorStore } from "../rag/in-memory-vector-store.js";
 import { tokenTracker } from "../utils/token-tracker.js";
+import { documentCache } from "../rag/document-cache.js";
 
 const DIMENSION = 3072;
 const RAG_THRESHOLD = 40000;
@@ -23,12 +24,12 @@ export const ingestDocumentTool = createTool({
     const indexName = `index-${docId}`;
 
     if (inputData.documentText.length < RAG_THRESHOLD) {
+      documentCache.set(indexName, inputData.documentText, inputData.documentTitle);
       return {
         documentId: docId,
         chunkCount: 0,
         indexName,
         documentTitle: inputData.documentTitle,
-        fullText: inputData.documentText,
         message: `Document ingested as full text (${inputData.documentText.length} chars, below RAG threshold).`,
       };
     }
