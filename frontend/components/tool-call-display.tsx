@@ -10,6 +10,7 @@ const TOOL_META: Record<string, { label: string; icon: string }> = {
   "recommend-strategy": { label: "Strategy Recommendation", icon: "\u{1F3AF}" },
   "analyze-document": { label: "Document Analysis", icon: "\u{1F50D}" },
   "summarize-document": { label: "Document Summary", icon: "\u{1F4DD}" },
+  "decompose-goal": { label: "Goal Decomposition", icon: "\u{1F9E9}" },
 };
 
 export function ToolCallDisplay(props: ToolCallMessagePartProps) {
@@ -54,7 +55,10 @@ function ThinkingStep({ toolName, result, status }: ToolCallMessagePartProps) {
           {toolName === "ingest-document" && <IngestResult data={result} />}
           {toolName === "analyze-compliance" && <ComplianceResult data={result} />}
           {toolName === "assess-risk" && <RiskResult data={result} />}
-          {!["ingest-document", "analyze-compliance", "assess-risk"].includes(toolName) && (
+          {toolName === "decompose-goal" && <DecomposeResult data={result} />}
+          {toolName === "analyze-document" && <AnalyzeDocumentResult data={result} />}
+          {toolName === "summarize-document" && <SummarizeDocumentResult data={result} />}
+          {!["ingest-document", "analyze-compliance", "assess-risk", "decompose-goal", "analyze-document", "summarize-document"].includes(toolName) && (
             <pre className="text-xs max-h-60 overflow-auto rounded bg-[var(--muted)] p-2 whitespace-pre-wrap">
               {JSON.stringify(result, null, 2)}
             </pre>
@@ -123,6 +127,113 @@ function RiskResult({ data }: { data: any }) {
       <p className="text-[var(--foreground)]">{data.summary}</p>
       <ListSection title="Penalty Clauses" items={data.penaltyClauses} max={4} />
       <ListSection title="Delivery Risks" items={data.deliveryRisks} max={4} />
+    </div>
+  );
+}
+
+function DecomposeResult({ data }: { data: any }) {
+  return (
+    <div className="space-y-2 text-xs">
+      <div>
+        <span className="text-[var(--muted-foreground)]">Goal: </span>
+        <span className="font-medium">{data.originalGoal}</span>
+      </div>
+      <div className="font-medium text-[var(--muted-foreground)]">
+        Sub-tasks ({data.subTasks?.length ?? 0})
+      </div>
+      <ol className="space-y-1.5 list-none pl-0">
+        {(data.subTasks ?? []).map((t: any) => (
+          <li key={t.taskId} className="flex gap-2">
+            <span className="shrink-0 w-5 h-5 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] flex items-center justify-center text-[10px] font-bold">
+              {t.taskId}
+            </span>
+            <div>
+              <div className="font-medium">{t.analysisGoal}</div>
+              <div className="text-[var(--muted-foreground)]">{t.rationale}</div>
+            </div>
+          </li>
+        ))}
+      </ol>
+      {data.executionNotes && (
+        <div className="text-[var(--muted-foreground)] italic">{data.executionNotes}</div>
+      )}
+    </div>
+  );
+}
+
+function AnalyzeDocumentResult({ data }: { data: any }) {
+  const importanceColors: Record<string, string> = {
+    low: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+    medium: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
+    high: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
+    critical: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+  };
+
+  return (
+    <div className="space-y-2 text-xs">
+      {data.analysisType && (
+        <div>
+          <span className="text-[var(--muted-foreground)]">Analysis: </span>
+          <span className="font-medium">{data.analysisType}</span>
+        </div>
+      )}
+      <p className="text-[var(--foreground)]">{data.summary}</p>
+      {data.keyFindings?.length > 0 && (
+        <div>
+          <div className="font-medium text-[var(--muted-foreground)] mb-1">
+            Key Findings ({data.keyFindings.length})
+          </div>
+          <ul className="space-y-1">
+            {data.keyFindings.map((f: any, i: number) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className={`shrink-0 mt-0.5 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${importanceColors[f.importance] ?? "bg-[var(--muted)]"}`}>
+                  {f.importance}
+                </span>
+                <div>
+                  <span className="font-medium">{f.category}: </span>
+                  <span>{f.finding}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <ListSection title="Recommendations" items={data.recommendations} />
+    </div>
+  );
+}
+
+function SummarizeDocumentResult({ data }: { data: any }) {
+  const [sectionsExpanded, setSectionsExpanded] = useState(false);
+
+  return (
+    <div className="space-y-2 text-xs">
+      {data.title && (
+        <div className="font-semibold text-sm">{data.title}</div>
+      )}
+      <p className="text-[var(--foreground)]">{data.overview}</p>
+      <ListSection title="Key Points" items={data.keyPoints} />
+      {data.sections?.length > 0 && (
+        <div>
+          <button
+            onClick={() => setSectionsExpanded(!sectionsExpanded)}
+            className="font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors flex items-center gap-1"
+          >
+            Sections ({data.sections.length})
+            <ChevronIcon expanded={sectionsExpanded} />
+          </button>
+          {sectionsExpanded && (
+            <div className="mt-1 space-y-2">
+              {data.sections.map((s: any, i: number) => (
+                <div key={i}>
+                  <div className="font-medium">{s.heading}</div>
+                  <div className="text-[var(--muted-foreground)]">{s.content}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

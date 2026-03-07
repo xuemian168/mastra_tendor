@@ -1,0 +1,59 @@
+import { createTool } from "@mastra/core/tools";
+import { z } from "zod";
+import { generalAnalystAgent } from "../agents/general-analyst.agent.js";
+import { tokenTracker } from "../utils/token-tracker.js";
+
+const decomposeOutputSchema = z.object({
+  originalGoal: z.string(),
+  subTasks: z.array(
+    z.object({
+      taskId: z.number(),
+      analysisGoal: z.string(),
+      rationale: z.string(),
+    }),
+  ),
+  executionNotes: z.string(),
+});
+
+export const decomposeGoalTool = createTool({
+  id: "decompose-goal",
+  description:
+    "Break down a broad or open-ended analysis goal into focused sub-tasks. " +
+    "Each sub-task produces an analysisGoal that can be passed to analyze-document.",
+  inputSchema: z.object({
+    goal: z.string().describe("The user's open-ended goal or request"),
+    documentContext: z
+      .string()
+      .optional()
+      .describe("Brief description of the document type, if known"),
+  }),
+  execute: async (inputData) => {
+    const contextHint = inputData.documentContext
+      ? `\nDocument type: ${inputData.documentContext}`
+      : "";
+
+    const prompt = `You are a task decomposition specialist. Given a broad analysis goal, break it down into 3-6 focused, non-overlapping sub-tasks that together cover the goal comprehensively.
+
+Goal: ${inputData.goal}${contextHint}
+
+Rules:
+- Each sub-task's analysisGoal should be specific enough for a single-pass document analysis
+- Sub-tasks should be complementary, not redundant
+- Order sub-tasks logically (foundational analysis first, synthesis last)
+- Keep each analysisGoal concise (1-2 sentences)`;
+
+    const result = await generalAnalystAgent.generate(prompt, {
+      structuredOutput: { schema: decomposeOutputSchema },
+    });
+
+    if (result.usage) {
+      tokenTracker.record(
+        "decompose-goal-tool",
+        result.usage.promptTokens,
+        result.usage.completionTokens,
+      );
+    }
+
+    return result.object;
+  },
+});
