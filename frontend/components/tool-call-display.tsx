@@ -8,6 +8,8 @@ const TOOL_META: Record<string, { label: string; icon: string }> = {
   "analyze-compliance": { label: "Compliance Analysis", icon: "\u{2705}" },
   "assess-risk": { label: "Risk Assessment", icon: "\u{26A0}\u{FE0F}" },
   "recommend-strategy": { label: "Strategy Recommendation", icon: "\u{1F3AF}" },
+  "analyze-document": { label: "Document Analysis", icon: "\u{1F50D}" },
+  "summarize-document": { label: "Document Summary", icon: "\u{1F4DD}" },
 };
 
 export function ToolCallDisplay(props: ToolCallMessagePartProps) {
