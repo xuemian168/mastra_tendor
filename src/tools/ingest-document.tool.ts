@@ -7,7 +7,7 @@ import { tokenTracker } from "../utils/token-tracker.js";
 import { documentCache } from "../rag/document-cache.js";
 
 const DIMENSION = 3072;
-const RAG_THRESHOLD = 40000;
+const RAG_THRESHOLD = parseInt(process.env.RAG_THRESHOLD ?? "15000", 10);
 
 export const ingestDocumentTool = createTool({
   id: "ingest-document",
