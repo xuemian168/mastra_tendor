@@ -21,6 +21,7 @@ export const analyzeDocumentTool = createTool({
     fullText: z.string().optional().describe("DEPRECATED: Do not pass. The system retrieves document text automatically by indexName."),
   }),
   execute: async (inputData) => {
+    tokenTracker.startStep("analyze-document-tool");
     try {
       const task = `Analyze the following document. Analysis goal: ${inputData.analysisGoal}`;
       let prompt: string;
@@ -46,11 +47,13 @@ export const analyzeDocumentTool = createTool({
       });
 
       if (result.usage) {
-        tokenTracker.record("analyze-document-tool", result.usage.promptTokens, result.usage.completionTokens);
+        tokenTracker.record("analyze-document-tool", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
       }
 
+      tokenTracker.completeStep("analyze-document-tool");
       return result.object;
     } catch (error) {
+      tokenTracker.completeStep("analyze-document-tool");
       return {
         error: true,
         message: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,

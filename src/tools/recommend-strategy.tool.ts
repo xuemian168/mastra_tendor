@@ -27,6 +27,7 @@ export const recommendStrategyTool = createTool({
     companyProfile: z.string().optional().describe("Optional company profile for context"),
   }),
   execute: async (inputData) => {
+    tokenTracker.startStep("strategy-tool");
     let prompt = `Based on the following analyses, provide a Bid/No-Bid recommendation.
 
 ## Compliance Analysis
@@ -70,11 +71,13 @@ export const recommendStrategyTool = createTool({
       });
 
       if (result.usage) {
-        tokenTracker.record("strategy-tool", result.usage.promptTokens, result.usage.completionTokens);
+        tokenTracker.record("strategy-tool", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
       }
 
+      tokenTracker.completeStep("strategy-tool");
       return result.object;
     } catch (error) {
+      tokenTracker.completeStep("strategy-tool");
       return {
         error: true,
         message: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,

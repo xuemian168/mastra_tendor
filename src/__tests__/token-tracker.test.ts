@@ -46,4 +46,27 @@ describe("TokenTracker", () => {
     expect(summary.total).toBe(0);
     expect(summary.byStep).toHaveLength(0);
   });
+
+  it("should track step timings", async () => {
+    tracker.startStep("test-step");
+    await new Promise((r) => setTimeout(r, 50));
+    tracker.completeStep("test-step");
+    const timings = tracker.getTimings();
+    expect(timings).toHaveLength(1);
+    expect(timings[0].step).toBe("test-step");
+    expect(timings[0].durationMs).toBeGreaterThanOrEqual(40);
+  });
+
+  it("should not include incomplete timings", () => {
+    tracker.startStep("incomplete-step");
+    const timings = tracker.getTimings();
+    expect(timings).toHaveLength(0);
+  });
+
+  it("should reset timings", () => {
+    tracker.startStep("step-a");
+    tracker.completeStep("step-a");
+    tracker.reset();
+    expect(tracker.getTimings()).toHaveLength(0);
+  });
 });

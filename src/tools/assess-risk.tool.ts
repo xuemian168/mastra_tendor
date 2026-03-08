@@ -21,6 +21,7 @@ export const assessRiskTool = createTool({
     fullText: z.string().optional().describe("DEPRECATED: Do not pass. The system retrieves document text automatically by indexName."),
   }),
   execute: async (inputData) => {
+    tokenTracker.startStep("risk-tool");
     try {
       let prompt: string;
 
@@ -53,11 +54,13 @@ export const assessRiskTool = createTool({
       });
 
       if (result.usage) {
-        tokenTracker.record("risk-tool", result.usage.promptTokens, result.usage.completionTokens);
+        tokenTracker.record("risk-tool", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
       }
 
+      tokenTracker.completeStep("risk-tool");
       return result.object;
     } catch (error) {
+      tokenTracker.completeStep("risk-tool");
       return {
         error: true,
         message: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,

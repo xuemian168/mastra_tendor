@@ -28,6 +28,7 @@ export const decomposeGoalTool = createTool({
       .describe("Short label of the document type (e.g. 'software license agreement', 'consulting contract'). Do NOT paste the full document text here."),
   }),
   execute: async (inputData) => {
+    tokenTracker.startStep("decompose-goal-tool");
     try {
       const contextHint = inputData.documentContext
         ? `\nDocument type: ${inputData.documentContext}`
@@ -50,13 +51,15 @@ Rules:
       if (result.usage) {
         tokenTracker.record(
           "decompose-goal-tool",
-          result.usage.promptTokens,
-          result.usage.completionTokens,
+          result.usage.inputTokens ?? 0,
+          result.usage.outputTokens ?? 0,
         );
       }
 
+      tokenTracker.completeStep("decompose-goal-tool");
       return result.object;
     } catch (error) {
+      tokenTracker.completeStep("decompose-goal-tool");
       return {
         error: true,
         message: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,

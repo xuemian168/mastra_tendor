@@ -13,6 +13,7 @@ export const riskStep = createStep({
   inputSchema: ingestOutputSchema,
   outputSchema: riskOutputSchema,
   execute: async ({ inputData }) => {
+    tokenTracker.startStep("risk-step");
     let prompt: string;
 
     if (inputData.fullText) {
@@ -40,9 +41,10 @@ export const riskStep = createStep({
     });
 
     if (result.usage) {
-      tokenTracker.record("risk-step", result.usage.promptTokens, result.usage.completionTokens);
+      tokenTracker.record("risk-step", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
     }
 
+    tokenTracker.completeStep("risk-step");
     return result.object;
   },
 });

@@ -3,6 +3,16 @@
 import { useState } from "react";
 import type { ToolCallMessagePartProps } from "@assistant-ui/react";
 
+const TOOL_PROGRESS_TEXT: Record<string, string> = {
+  "ingest-document": "Chunking and indexing document...",
+  "analyze-compliance": "Extracting compliance requirements...",
+  "assess-risk": "Evaluating risk factors...",
+  "recommend-strategy": "Synthesizing recommendation...",
+  "analyze-document": "Analyzing document content...",
+  "summarize-document": "Generating structured summary...",
+  "decompose-goal": "Breaking down analysis goals...",
+};
+
 const TOOL_META: Record<string, { label: string; icon: string }> = {
   "ingest-document": { label: "Document Ingestion", icon: "\u{1F4C4}" },
   "analyze-compliance": { label: "Compliance Analysis", icon: "\u{2705}" },
@@ -43,7 +53,9 @@ function ThinkingStep({ toolName, result, status }: ToolCallMessagePartProps) {
         <span className="text-base">{meta.icon}</span>
         <span className="font-medium flex-1">{meta.label}</span>
         {isRunning ? (
-          <span className="thinking-dot text-[var(--primary)] text-xs">Processing...</span>
+          <span className="thinking-dot text-[var(--primary)] text-xs">
+            {TOOL_PROGRESS_TEXT[toolName] ?? "Processing..."}
+          </span>
         ) : (
           <span className="text-xs text-[var(--muted-foreground)]">Done</span>
         )}

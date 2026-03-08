@@ -13,6 +13,7 @@ export const complianceStep = createStep({
   inputSchema: ingestOutputSchema,
   outputSchema: complianceOutputSchema,
   execute: async ({ inputData }) => {
+    tokenTracker.startStep("compliance-step");
     let prompt: string;
 
     if (inputData.fullText) {
@@ -40,9 +41,10 @@ export const complianceStep = createStep({
     });
 
     if (result.usage) {
-      tokenTracker.record("compliance-step", result.usage.promptTokens, result.usage.completionTokens);
+      tokenTracker.record("compliance-step", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
     }
 
+    tokenTracker.completeStep("compliance-step");
     return result.object;
   },
 });

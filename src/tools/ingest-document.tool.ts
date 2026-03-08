@@ -20,11 +20,13 @@ export const ingestDocumentTool = createTool({
     documentTitle: z.string().optional().describe("Optional title of the document"),
   }),
   execute: async (inputData) => {
+    tokenTracker.startStep("ingest-tool");
     const docId = `doc-${Date.now()}`;
     const indexName = `index-${docId}`;
 
     if (inputData.documentText.length < RAG_THRESHOLD) {
       documentCache.set(indexName, inputData.documentText, inputData.documentTitle);
+      tokenTracker.completeStep("ingest-tool");
       return {
         documentId: docId,
         chunkCount: 0,
@@ -47,6 +49,7 @@ export const ingestDocumentTool = createTool({
 
     const estimatedTokens = Math.ceil(inputData.documentText.length / 4);
     tokenTracker.record("ingest-tool-embedding", estimatedTokens, 0);
+    tokenTracker.completeStep("ingest-tool");
 
     return {
       documentId: docId,

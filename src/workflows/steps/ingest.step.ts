@@ -14,10 +14,12 @@ export const ingestStep = createStep({
   inputSchema: tenderInputSchema,
   outputSchema: ingestOutputSchema,
   execute: async ({ inputData }) => {
+    tokenTracker.startStep("ingest-step");
     const tenderId = `tender-${Date.now()}`;
     const indexName = `index-${tenderId}`;
 
     if (inputData.tenderText.length < RAG_THRESHOLD) {
+      tokenTracker.completeStep("ingest-step");
       return {
         tenderId,
         chunkCount: 0,
@@ -45,6 +47,7 @@ export const ingestStep = createStep({
     const estimatedTokens = Math.ceil(inputData.tenderText.length / 4);
     tokenTracker.record("ingest-step-embedding", estimatedTokens, 0);
 
+    tokenTracker.completeStep("ingest-step");
     return {
       tenderId,
       chunkCount: chunks.length,

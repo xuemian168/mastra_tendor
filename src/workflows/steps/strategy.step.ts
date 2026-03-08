@@ -20,6 +20,7 @@ export const strategyStep = createStep({
   inputSchema: strategyInputSchema,
   outputSchema: strategyOutputSchema,
   execute: async ({ inputData, getInitData }) => {
+    tokenTracker.startStep("strategy-step");
     const compliance = inputData["compliance-step"];
     const risk = inputData["risk-step"];
     const initData = getInitData() as { companyProfile?: string } | undefined;
@@ -67,9 +68,10 @@ export const strategyStep = createStep({
     });
 
     if (result.usage) {
-      tokenTracker.record("strategy-step", result.usage.promptTokens, result.usage.completionTokens);
+      tokenTracker.record("strategy-step", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
     }
 
+    tokenTracker.completeStep("strategy-step");
     return result.object;
   },
 });
