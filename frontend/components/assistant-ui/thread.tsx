@@ -129,15 +129,9 @@ const ThreadSuggestions: FC = () => {
           prompt={s.text}
           method="replace"
           autoSend={false}
+          className="fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-200 h-auto w-full flex-wrap items-start justify-start gap-1 rounded-2xl border px-4 py-3 text-left text-sm transition-colors hover:bg-muted"
         >
-          <div className="fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-200">
-            <Button
-              variant="ghost"
-              className="h-auto w-full flex-wrap items-start justify-start gap-1 rounded-2xl border px-4 py-3 text-left text-sm transition-colors hover:bg-muted"
-            >
-              <span className="font-medium">{s.text}</span>
-            </Button>
-          </div>
+          <span className="font-medium">{s.text}</span>
         </ThreadPrimitive.Suggestion>
       ))}
     </div>
