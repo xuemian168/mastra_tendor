@@ -3,7 +3,6 @@ import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button
 import { ToolFallback } from "@/components/assistant-ui/tool-fallback";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ToolCallDisplay, KNOWN_TOOLS } from "@/components/tool-call-display";
 import {
   PipelineProgress,
   isTenderPipeline,
@@ -22,7 +21,6 @@ import {
   useComposerRuntime,
   useMessage,
 } from "@assistant-ui/react";
-import type { ToolCallMessagePartProps } from "@assistant-ui/react";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -41,14 +39,6 @@ import {
   FileTextIcon,
 } from "lucide-react";
 import { type FC, useState, useEffect, useRef, useCallback } from "react";
-
-/** Delegates to ToolCallDisplay for known document tools, ToolFallback for everything else */
-const SmartToolRenderer = (props: ToolCallMessagePartProps) => {
-  if (KNOWN_TOOLS.has(props.toolName)) {
-    return <ToolCallDisplay {...props} />;
-  }
-  return <ToolFallback {...props} />;
-};
 
 export const Thread: FC = () => {
   return (
@@ -357,7 +347,7 @@ const AssistantMessage: FC = () => {
         <MessagePrimitive.Parts
           components={{
             Text: MarkdownText,
-            tools: { Fallback: SmartToolRenderer },
+            tools: { Fallback: ToolFallback },
           }}
         />
         <MessageError />

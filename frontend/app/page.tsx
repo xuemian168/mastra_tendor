@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { Thread } from "@/components/assistant-ui/thread";
+import { RegisterToolUIs } from "@/components/tool-uis";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CompanyProfileDialog } from "@/components/company-profile-dialog";
 import {
@@ -36,6 +37,7 @@ export default function Home() {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <CompanyProfileInstructions profile={profile} />
+      <RegisterToolUIs />
       <TooltipProvider>
         <main className="flex h-screen flex-col">
           <header className="flex items-center justify-between border-b border-border px-6 py-3">
