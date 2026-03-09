@@ -13,6 +13,9 @@ const TOOL_PROGRESS_TEXT: Record<string, string> = {
   "decompose-goal": "Breaking down analysis goals...",
 };
 
+/** Set of tool names that have specialized renderers in this component */
+export const KNOWN_TOOLS = new Set(Object.keys(TOOL_PROGRESS_TEXT));
+
 const TOOL_META: Record<string, { label: string; icon: string }> = {
   "ingest-document": { label: "Document Ingestion", icon: "\u{1F4C4}" },
   "analyze-compliance": { label: "Compliance Analysis", icon: "\u{2705}" },

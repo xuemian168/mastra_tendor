@@ -1,8 +1,9 @@
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
+import { ToolFallback } from "@/components/assistant-ui/tool-fallback";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ToolCallDisplay } from "@/components/tool-call-display";
+import { ToolCallDisplay, KNOWN_TOOLS } from "@/components/tool-call-display";
 import {
   PipelineProgress,
   isTenderPipeline,
@@ -21,6 +22,7 @@ import {
   useComposerRuntime,
   useMessage,
 } from "@assistant-ui/react";
+import type { ToolCallMessagePartProps } from "@assistant-ui/react";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -39,6 +41,14 @@ import {
   FileTextIcon,
 } from "lucide-react";
 import { type FC, useState, useEffect, useRef, useCallback } from "react";
+
+/** Delegates to ToolCallDisplay for known document tools, ToolFallback for everything else */
+const SmartToolRenderer = (props: ToolCallMessagePartProps) => {
+  if (KNOWN_TOOLS.has(props.toolName)) {
+    return <ToolCallDisplay {...props} />;
+  }
+  return <ToolFallback {...props} />;
+};
 
 export const Thread: FC = () => {
   return (
@@ -181,9 +191,9 @@ const Composer: FC = () => {
     if (!loadedFile) return;
 
     const currentText = composerRuntime.getState().text.trim();
-    const fullMessage = currentText
-      ? `${currentText}\n\n[Document: "${loadedFile.title}"]\n\n${loadedFile.text}`
-      : `Please analyze the following document titled "${loadedFile.title}":\n\n${loadedFile.text}`;
+    const userIntent = currentText || `Please analyze the following document.`;
+    const documentTag = `<document title="${loadedFile.title}" chars="${loadedFile.text.length}">\n${loadedFile.text}\n</document>`;
+    const fullMessage = `${userIntent}\n\n${documentTag}`;
 
     composerRuntime.setText(fullMessage);
     setLoadedFile(null);
@@ -347,7 +357,7 @@ const AssistantMessage: FC = () => {
         <MessagePrimitive.Parts
           components={{
             Text: MarkdownText,
-            tools: { Fallback: ToolCallDisplay },
+            tools: { Fallback: SmartToolRenderer },
           }}
         />
         <MessageError />
