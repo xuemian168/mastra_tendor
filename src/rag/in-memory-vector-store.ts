@@ -1,3 +1,18 @@
+import { MastraVector } from "@mastra/core/vector";
+import type {
+  CreateIndexParams,
+  UpsertVectorParams,
+  QueryVectorParams,
+  QueryResult,
+  IndexStats,
+  DescribeIndexParams,
+  DeleteIndexParams,
+  UpdateVectorParams,
+  DeleteVectorParams,
+  DeleteVectorsParams,
+} from "@mastra/core/vector";
+import type { VectorFilter } from "@mastra/core/vector";
+
 interface IndexEntry {
   id: string;
   vector: number[];
@@ -24,67 +39,61 @@ function cosineSimilarity(a: number[], aNorm: number, b: number[], bNorm: number
   return dot / (aNorm * bNorm);
 }
 
-export class InMemoryVectorStore {
+/**
+ * In-memory vector store extending Mastra's MastraVector abstraction.
+ * Provides cosine similarity search with metadata filtering.
+ */
+export class InMemoryVectorStore extends MastraVector {
   private indexes = new Map<string, IndexInfo>();
 
-  createIndex({
-    indexName,
-    dimension,
-    metric = "cosine",
-  }: {
-    indexName: string;
-    dimension: number;
-    metric?: string;
-  }): void {
+  constructor() {
+    super({ id: "in-memory-vector" });
+  }
+
+  async createIndex({ indexName, dimension, metric = "cosine" }: CreateIndexParams): Promise<void> {
     if (!this.indexes.has(indexName)) {
       this.indexes.set(indexName, { dimension, metric, entries: new Map() });
     }
   }
 
-  upsert({
-    indexName,
-    vectors,
-    metadata,
-    ids,
-  }: {
-    indexName: string;
-    vectors: number[][];
-    metadata: Record<string, unknown>[];
-    ids: string[];
-  }): void {
+  async upsert({ indexName, vectors, metadata, ids }: UpsertVectorParams): Promise<string[]> {
     const index = this.indexes.get(indexName);
     if (!index) throw new Error(`Index "${indexName}" not found`);
 
-    for (let i = 0; i < ids.length; i++) {
+    const resolvedIds = ids ?? vectors.map((_, i) => `vec-${Date.now()}-${i}`);
+
+    for (let i = 0; i < resolvedIds.length; i++) {
       const vector = vectors[i];
       if (vector.length !== index.dimension) {
         throw new Error(`Vector dimension mismatch: expected ${index.dimension}, got ${vector.length}`);
       }
-      index.entries.set(ids[i], {
-        id: ids[i],
+      index.entries.set(resolvedIds[i], {
+        id: resolvedIds[i],
         vector,
         norm: l2Norm(vector),
-        metadata: metadata[i],
+        metadata: metadata?.[i] ?? {},
       });
     }
+
+    return resolvedIds;
   }
 
-  query({
-    indexName,
-    queryVector,
-    topK = 5,
-    filter,
-  }: {
-    indexName: string;
-    queryVector: number[];
-    topK?: number;
-    filter?: Record<string, unknown>;
-  }): { id: string; score: number; metadata: Record<string, unknown> }[] {
+  async query({ indexName, queryVector, topK = 5, filter }: QueryVectorParams): Promise<QueryResult[]> {
     const index = this.indexes.get(indexName);
     if (!index) throw new Error(`Index "${indexName}" not found`);
 
+    if (!queryVector) {
+      // Metadata-only query
+      const results: QueryResult[] = [];
+      for (const entry of index.entries.values()) {
+        if (filter && !matchesFilter(entry.metadata, filter)) continue;
+        results.push({ id: entry.id, score: 1, metadata: entry.metadata });
+      }
+      return results.slice(0, topK);
+    }
+
     const queryNorm = l2Norm(queryVector);
-    const results: { id: string; score: number; metadata: Record<string, unknown> }[] = [];
+    const results: QueryResult[] = [];
 
     for (const entry of index.entries.values()) {
       if (filter && !matchesFilter(entry.metadata, filter)) continue;
@@ -96,22 +105,67 @@ export class InMemoryVectorStore {
     return results.slice(0, topK);
   }
 
-  deleteIndex(indexName: string): void {
+  async deleteIndex({ indexName }: DeleteIndexParams): Promise<void> {
     this.indexes.delete(indexName);
   }
 
-  listIndexes(): string[] {
+  async listIndexes(): Promise<string[]> {
     return Array.from(this.indexes.keys());
   }
 
-  describeIndex(indexName: string): { dimension: number; metric: string; count: number } | undefined {
+  async describeIndex({ indexName }: DescribeIndexParams): Promise<IndexStats> {
     const index = this.indexes.get(indexName);
-    if (!index) return undefined;
-    return { dimension: index.dimension, metric: index.metric, count: index.entries.size };
+    if (!index) {
+      return { dimension: 0, count: 0, metric: "cosine" };
+    }
+    return {
+      dimension: index.dimension,
+      count: index.entries.size,
+      metric: index.metric as IndexStats["metric"],
+    };
+  }
+
+  async updateVector(params: UpdateVectorParams): Promise<void> {
+    const index = this.indexes.get(params.indexName);
+    if (!index) throw new Error(`Index "${params.indexName}" not found`);
+
+    if ("id" in params && params.id) {
+      const entry = index.entries.get(params.id);
+      if (!entry) return;
+      if (params.update.vector) {
+        entry.vector = params.update.vector;
+        entry.norm = l2Norm(params.update.vector);
+      }
+      if (params.update.metadata) {
+        entry.metadata = { ...entry.metadata, ...params.update.metadata };
+      }
+    }
+  }
+
+  async deleteVector({ indexName, id }: DeleteVectorParams): Promise<void> {
+    const index = this.indexes.get(indexName);
+    if (index) index.entries.delete(id);
+  }
+
+  async deleteVectors({ indexName, ids, filter }: DeleteVectorsParams): Promise<void> {
+    const index = this.indexes.get(indexName);
+    if (!index) return;
+
+    if (ids) {
+      for (const id of ids) index.entries.delete(id);
+    } else if (filter) {
+      for (const [id, entry] of index.entries) {
+        if (matchesFilter(entry.metadata, filter)) {
+          index.entries.delete(id);
+        }
+      }
+    }
   }
 }
 
-function matchesFilter(metadata: Record<string, unknown>, filter: Record<string, unknown>): boolean {
+function matchesFilter(metadata: Record<string, unknown>, filter: VectorFilter): boolean {
+  if (!filter) return true;
+
   for (const [key, value] of Object.entries(filter)) {
     if (Array.isArray(value)) {
       if (!value.includes(metadata[key])) return false;

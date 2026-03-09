@@ -30,26 +30,10 @@ export async function parseFile(file: File): Promise<ParsedFile> {
 }
 
 async function parsePdf(file: File): Promise<string> {
-  const pdfjsLib = await import("pdfjs-dist");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.min.mjs",
-    import.meta.url,
-  ).toString();
-
+  const { extractText } = await import("unpdf");
   const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const pages: string[] = [];
-
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    const text = content.items
-      .map((item) => ("str" in item ? item.str : ""))
-      .join(" ");
-    pages.push(text);
-  }
-
-  return pages.join("\n\n");
+  const { text } = await extractText(arrayBuffer);
+  return Array.isArray(text) ? text.join("\n\n") : text;
 }
 
 async function parseDocx(file: File): Promise<string> {

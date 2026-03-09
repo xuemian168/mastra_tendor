@@ -1,5 +1,5 @@
 import type { SectionType, TenderChunk } from "./types.js";
-import type { InMemoryVectorStore } from "./in-memory-vector-store.js";
+import type { MastraVector } from "@mastra/core/vector";
 
 export interface RetrievalConfig {
   queries: string[];
@@ -35,7 +35,7 @@ export const RISK_RETRIEVAL_CONFIG: RetrievalConfig = {
 };
 
 export async function retrieveForAgent(
-  store: InMemoryVectorStore,
+  store: MastraVector,
   indexName: string,
   config: RetrievalConfig,
   embedFn: (query: string) => Promise<number[]>,
@@ -51,13 +51,13 @@ export async function retrieveForAgent(
 
   for (const query of config.queries) {
     const queryVector = await embedFn(query);
-    const results = store.query({ indexName, queryVector, topK, filter });
+    const results = await store.query({ indexName, queryVector, topK, filter });
 
     for (const result of results) {
       if (result.score < threshold) continue;
       const existing = bestByChunkId.get(result.id);
       if (!existing || result.score > existing.score) {
-        bestByChunkId.set(result.id, { score: result.score, metadata: result.metadata });
+        bestByChunkId.set(result.id, { score: result.score, metadata: result.metadata ?? {} });
       }
     }
   }

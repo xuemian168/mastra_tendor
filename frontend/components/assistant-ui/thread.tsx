@@ -1,6 +1,11 @@
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { ToolFallback } from "@/components/assistant-ui/tool-fallback";
+import {
+  ComposerAddAttachment,
+  ComposerAttachments,
+  UserMessageAttachments,
+} from "@/components/assistant-ui/attachment";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -8,7 +13,6 @@ import {
   isTenderPipeline,
   type ToolCallInfo,
 } from "@/components/pipeline-progress";
-import { parseFile, type ParsedFile } from "@/lib/file-parser";
 import {
   ActionBarMorePrimitive,
   ActionBarPrimitive,
@@ -18,7 +22,6 @@ import {
   ErrorPrimitive,
   MessagePrimitive,
   ThreadPrimitive,
-  useComposerRuntime,
   useMessage,
 } from "@assistant-ui/react";
 import {
@@ -33,12 +36,8 @@ import {
   PencilIcon,
   RefreshCwIcon,
   SquareIcon,
-  PaperclipIcon,
-  LoaderIcon,
-  XIcon,
-  FileTextIcon,
 } from "lucide-react";
-import { type FC, useState, useEffect, useRef, useCallback } from "react";
+import type { FC } from "react";
 
 export const Thread: FC = () => {
   return (
@@ -138,87 +137,12 @@ const ThreadSuggestions: FC = () => {
   );
 };
 
-/* ── Composer with file upload ── */
+/* ── Composer (uses assistant-ui's built-in attachment system) ── */
 
 const Composer: FC = () => {
-  const composerRuntime = useComposerRuntime();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [loadedFile, setLoadedFile] = useState<ParsedFile | null>(null);
-  const [parsing, setParsing] = useState(false);
-  const [parseError, setParseError] = useState<string | null>(null);
-
-  const handleFileChange = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      setParsing(true);
-      setParseError(null);
-      try {
-        const parsed = await parseFile(file);
-        setLoadedFile(parsed);
-        composerRuntime.setText(
-          `Please analyze the document: "${parsed.title}"`,
-        );
-      } catch (err) {
-        setParseError(
-          err instanceof Error ? err.message : "Failed to parse file",
-        );
-      } finally {
-        setParsing(false);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      }
-    },
-    [composerRuntime],
-  );
-
-  const removeFile = useCallback(() => {
-    setLoadedFile(null);
-    composerRuntime.setText("");
-  }, [composerRuntime]);
-
-  const handleSubmit = useCallback(() => {
-    if (!loadedFile) return;
-
-    const currentText = composerRuntime.getState().text.trim();
-    const userIntent = currentText || `Please analyze the following document.`;
-    const documentTag = `<document title="${loadedFile.title}" chars="${loadedFile.text.length}">\n${loadedFile.text}\n</document>`;
-    const fullMessage = `${userIntent}\n\n${documentTag}`;
-
-    composerRuntime.setText(fullMessage);
-    setLoadedFile(null);
-
-    queueMicrotask(() => {
-      composerRuntime.send();
-    });
-  }, [composerRuntime, loadedFile]);
-
   return (
     <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
-      {/* File tag */}
-      {loadedFile && (
-        <div className="mb-2 flex items-center gap-2 rounded-lg bg-accent px-3 py-1.5 text-xs">
-          <FileTextIcon className="size-3.5" />
-          <span className="font-medium">{loadedFile.title}</span>
-          <span className="text-muted-foreground">
-            ({(loadedFile.text.length / 1000).toFixed(1)}k chars)
-          </span>
-          <button
-            onClick={removeFile}
-            className="ml-auto rounded p-0.5 hover:bg-muted transition-colors"
-            aria-label="Remove file"
-          >
-            <XIcon className="size-3.5" />
-          </button>
-        </div>
-      )}
-
-      {/* Parse error */}
-      {parseError && (
-        <div className="mb-2 rounded-lg bg-destructive/10 px-3 py-1.5 text-xs text-destructive">
-          {parseError}
-        </div>
-      )}
+      <ComposerAttachments />
 
       <div className="flex w-full flex-col rounded-2xl border border-input bg-background px-1 pt-2 outline-none transition-shadow has-[textarea:focus-visible]:border-ring has-[textarea:focus-visible]:ring-2 has-[textarea:focus-visible]:ring-ring/20">
         <ComposerPrimitive.Input
@@ -229,58 +153,22 @@ const Composer: FC = () => {
           aria-label="Message input"
         />
         <div className="aui-composer-action-wrapper relative mx-2 mb-2 flex items-center justify-between">
-          {/* Hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".txt,.md,.pdf,.docx"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-          <TooltipIconButton
-            tooltip="Upload document"
-            side="bottom"
-            variant="ghost"
-            size="icon"
-            className="size-8.5 rounded-full p-1 hover:bg-muted-foreground/15"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={parsing}
-          >
-            {parsing ? (
-              <LoaderIcon className="size-5 animate-spin" />
-            ) : (
-              <PaperclipIcon className="size-5 stroke-[1.5px]" />
-            )}
-          </TooltipIconButton>
+          <ComposerAddAttachment />
 
           <AuiIf condition={(s) => !s.thread.isRunning}>
-            {loadedFile ? (
+            <ComposerPrimitive.Send asChild>
               <TooltipIconButton
                 tooltip="Send message"
                 side="bottom"
                 type="button"
                 variant="default"
                 size="icon"
-                className="size-8 rounded-full"
-                onClick={handleSubmit}
+                className="aui-composer-send size-8 rounded-full"
+                aria-label="Send message"
               >
-                <ArrowUpIcon className="size-4" />
+                <ArrowUpIcon className="aui-composer-send-icon size-4" />
               </TooltipIconButton>
-            ) : (
-              <ComposerPrimitive.Send asChild>
-                <TooltipIconButton
-                  tooltip="Send message"
-                  side="bottom"
-                  type="button"
-                  variant="default"
-                  size="icon"
-                  className="aui-composer-send size-8 rounded-full"
-                  aria-label="Send message"
-                >
-                  <ArrowUpIcon className="aui-composer-send-icon size-4" />
-                </TooltipIconButton>
-              </ComposerPrimitive.Send>
-            )}
+            </ComposerPrimitive.Send>
           </AuiIf>
           <AuiIf condition={(s) => s.thread.isRunning}>
             <ComposerPrimitive.Cancel asChild>
@@ -315,22 +203,14 @@ const MessageError: FC = () => {
 
 const AssistantMessagePipeline: FC = () => {
   const message = useMessage();
-  const [toolCalls, setToolCalls] = useState<ToolCallInfo[]>([]);
+  if (message.role !== "assistant") return null;
 
-  useEffect(() => {
-    if (message.role !== "assistant") return;
-    const parts = message.content;
-    const calls: ToolCallInfo[] = [];
-    for (const part of parts) {
-      if (part.type === "tool-call") {
-        calls.push({
-          toolName: part.toolName,
-          status: part.result !== undefined ? "done" : "running",
-        });
-      }
-    }
-    setToolCalls(calls);
-  }, [message]);
+  const toolCalls: ToolCallInfo[] = message.content
+    .filter((part): part is typeof part & { type: "tool-call" } => part.type === "tool-call")
+    .map((part) => ({
+      toolName: part.toolName,
+      status: part.result !== undefined ? ("done" as const) : ("running" as const),
+    }));
 
   if (!isTenderPipeline(toolCalls)) return null;
   return <PipelineProgress toolCalls={toolCalls} />;
@@ -415,9 +295,10 @@ const UserMessage: FC = () => {
       className="aui-user-message-root fade-in slide-in-from-bottom-1 mx-auto grid w-full max-w-(--thread-max-width) animate-in auto-rows-auto grid-cols-[minmax(72px,1fr)_auto] content-start gap-y-2 px-2 py-3 duration-150 [&:where(>*)]:col-start-2"
       data-role="user"
     >
+      <UserMessageAttachments />
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
         <div className="aui-user-message-content wrap-break-word rounded-2xl bg-muted px-4 py-2.5 text-foreground">
-          <MessagePrimitive.Parts />
+          <MessagePrimitive.Parts components={{ Text: MarkdownText }} />
         </div>
         <div className="aui-user-action-bar-wrapper absolute top-1/2 left-0 -translate-x-full -translate-y-1/2 pr-2">
           <UserActionBar />

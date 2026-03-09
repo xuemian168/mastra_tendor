@@ -1,5 +1,12 @@
 import { createTool } from "@mastra/core/tools";
+import { tavily } from "@tavily/core";
 import { z } from "zod";
+
+let tvly: ReturnType<typeof tavily>;
+function getTavily() {
+  if (!tvly) tvly = tavily({ apiKey: process.env.TAVILY_API_KEY ?? "" });
+  return tvly;
+}
 
 export const webSearchTool = createTool({
   id: "web-search",
@@ -11,12 +18,21 @@ export const webSearchTool = createTool({
     query: z.string().describe("The search query"),
   }),
   execute: async ({ query }) => {
-    const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+    const response = await getTavily().search(query, {
+      maxResults: 5,
+      includeAnswer: true,
+    });
+
+    const sources = response.results.map((r) => ({
+      title: r.title,
+      url: r.url,
+      snippet: r.content,
+    }));
+
     return {
       query,
-      message:
-        "Web search is a placeholder — integrate a search API (e.g. Google Custom Search, Exa) for production use.",
-      searchUrl: url,
+      answer: response.answer,
+      sources,
     };
   },
 });

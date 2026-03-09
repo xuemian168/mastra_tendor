@@ -39,8 +39,8 @@ export const ingestDocumentTool = createTool({
     const chunks = chunkTenderDocument(inputData.documentText, docId);
     const vectors = await embedTexts(chunks.map((c) => c.content));
 
-    vectorStore.createIndex({ indexName, dimension: DIMENSION });
-    vectorStore.upsert({
+    await vectorStore.createIndex({ indexName, dimension: DIMENSION });
+    await vectorStore.upsert({
       indexName,
       vectors,
       metadata: chunks.map((c) => ({ ...c.metadata, content: c.content })),

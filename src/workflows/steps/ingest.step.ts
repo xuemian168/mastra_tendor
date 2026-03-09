@@ -33,8 +33,8 @@ export const ingestStep = createStep({
 
     const vectors = await embedTexts(chunks.map((c) => c.content));
 
-    vectorStore.createIndex({ indexName, dimension: DIMENSION });
-    vectorStore.upsert({
+    await vectorStore.createIndex({ indexName, dimension: DIMENSION });
+    await vectorStore.upsert({
       indexName,
       vectors,
       metadata: chunks.map((c) => ({

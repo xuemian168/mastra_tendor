@@ -61,7 +61,7 @@ describe("complianceStep", () => {
     const { embedTexts } = await import("../rag/embedder.js");
 
     const indexName = "test-compliance-index";
-    vectorStore.createIndex({ indexName, dimension: 3072 });
+    await vectorStore.createIndex({ indexName, dimension: 3072 });
 
     const testChunks = [
       { id: "c-0", content: "Technical specifications require ISO 27001", sectionType: "technical_requirements", sectionTitle: "Technical Requirements", chunkIndex: 0, tenderId: "test" },
@@ -69,7 +69,7 @@ describe("complianceStep", () => {
     ];
 
     const vectors = await embedTexts(testChunks.map(c => c.content));
-    vectorStore.upsert({
+    await vectorStore.upsert({
       indexName,
       vectors,
       metadata: testChunks.map(c => ({ ...c, content: c.content })),
@@ -101,7 +101,7 @@ describe("complianceStep", () => {
     expect(result).toEqual(mockComplianceOutput);
 
     // Cleanup
-    vectorStore.deleteIndex(indexName);
+    await vectorStore.deleteIndex({ indexName });
   });
 });
 
@@ -156,14 +156,14 @@ describe("riskStep", () => {
     const { embedTexts } = await import("../rag/embedder.js");
 
     const indexName = "test-risk-index";
-    vectorStore.createIndex({ indexName, dimension: 3072 });
+    await vectorStore.createIndex({ indexName, dimension: 3072 });
 
     const testChunks = [
       { id: "r-0", content: "Penalty of 5% per week for late delivery", sectionType: "penalties", sectionTitle: "Penalties", chunkIndex: 0, tenderId: "test" },
     ];
 
     const vectors = await embedTexts(testChunks.map(c => c.content));
-    vectorStore.upsert({
+    await vectorStore.upsert({
       indexName,
       vectors,
       metadata: testChunks.map(c => ({ ...c, content: c.content })),
@@ -190,7 +190,7 @@ describe("riskStep", () => {
     expect(prompt).toContain("Relevant sections:");
     expect(result).toEqual(mockRiskOutput);
 
-    vectorStore.deleteIndex(indexName);
+    await vectorStore.deleteIndex({ indexName });
   });
 });
 

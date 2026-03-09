@@ -18,6 +18,7 @@ const TOOL_NAMES = [
   "analyze-document",
   "summarize-document",
   "decompose-goal",
+  "web-search",
 ] as const;
 
 /** One registration component per tool, all delegating to ToolCallDisplay */

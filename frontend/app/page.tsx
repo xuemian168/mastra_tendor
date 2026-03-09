@@ -12,6 +12,7 @@ import {
   loadProfile,
 } from "@/lib/company-profile";
 import { CompanyProfileInstructions } from "@/components/company-profile-instructions";
+import { documentAttachmentAdapter } from "@/lib/document-attachment-adapter";
 
 const MASTRA_URL =
   process.env.NEXT_PUBLIC_MASTRA_URL || "http://localhost:4111";
@@ -21,7 +22,10 @@ const transport = new AssistantChatTransport({
 });
 
 export default function Home() {
-  const runtime = useChatRuntime({ transport });
+  const runtime = useChatRuntime({
+    transport,
+    adapters: { attachments: documentAttachmentAdapter },
+  });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [profile, setProfile] = useState<CompanyProfile>({
     companyName: "",

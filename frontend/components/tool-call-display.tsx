@@ -11,6 +11,7 @@ const TOOL_PROGRESS_TEXT: Record<string, string> = {
   "analyze-document": "Analyzing document content...",
   "summarize-document": "Generating structured summary...",
   "decompose-goal": "Breaking down analysis goals...",
+  "web-search": "Searching the web...",
 };
 
 const TOOL_META: Record<string, { label: string; icon: string }> = {
@@ -21,6 +22,7 @@ const TOOL_META: Record<string, { label: string; icon: string }> = {
   "analyze-document": { label: "Document Analysis", icon: "\u{1F50D}" },
   "summarize-document": { label: "Document Summary", icon: "\u{1F4DD}" },
   "decompose-goal": { label: "Goal Decomposition", icon: "\u{1F9E9}" },
+  "web-search": { label: "Web Search", icon: "\u{1F310}" },
 };
 
 export function ToolCallDisplay(props: ToolCallMessagePartProps) {
@@ -70,7 +72,8 @@ function ThinkingStep({ toolName, result, status }: ToolCallMessagePartProps) {
           {toolName === "decompose-goal" && <DecomposeResult data={result} />}
           {toolName === "analyze-document" && <AnalyzeDocumentResult data={result} />}
           {toolName === "summarize-document" && <SummarizeDocumentResult data={result} />}
-          {!["ingest-document", "analyze-compliance", "assess-risk", "decompose-goal", "analyze-document", "summarize-document"].includes(toolName) && (
+          {toolName === "web-search" && <WebSearchResult data={result} />}
+          {!["ingest-document", "analyze-compliance", "assess-risk", "decompose-goal", "analyze-document", "summarize-document", "web-search"].includes(toolName) && (
             <pre className="text-xs max-h-60 overflow-auto rounded bg-[var(--muted)] p-2 whitespace-pre-wrap">
               {JSON.stringify(result, null, 2)}
             </pre>
@@ -244,6 +247,43 @@ function SummarizeDocumentResult({ data }: { data: any }) {
               ))}
             </div>
           )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WebSearchResult({ data }: { data: any }) {
+  return (
+    <div className="space-y-2 text-xs">
+      {data.answer && (
+        <p className="text-[var(--foreground)]">{data.answer}</p>
+      )}
+      {data.sources?.length > 0 && (
+        <div>
+          <div className="font-medium text-[var(--muted-foreground)] mb-1">
+            Sources ({data.sources.length})
+          </div>
+          <ul className="space-y-1.5">
+            {data.sources.map((s: any, i: number) => (
+              <li key={i} className="flex gap-1.5">
+                <span className="text-[var(--muted-foreground)] shrink-0">{"\u{1F517}"}</span>
+                <div className="min-w-0">
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-[var(--primary)] hover:underline break-all"
+                  >
+                    {s.title}
+                  </a>
+                  {s.snippet && (
+                    <p className="text-[var(--muted-foreground)] line-clamp-2 mt-0.5">{s.snippet}</p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

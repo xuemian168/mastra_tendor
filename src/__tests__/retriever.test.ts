@@ -10,9 +10,9 @@ describe("retrieveForAgent", () => {
   const dim = 8;
   let store: InMemoryVectorStore;
 
-  function setupStore() {
+  async function setupStore() {
     store = new InMemoryVectorStore();
-    store.createIndex({ indexName: "test", dimension: dim });
+    await store.createIndex({ indexName: "test", dimension: dim });
 
     const entries = [
       { id: "0", sectionType: "technical_requirements", content: "Must use Kubernetes" },
@@ -22,7 +22,7 @@ describe("retrieveForAgent", () => {
       { id: "4", sectionType: "scope", content: "Build a cloud platform" },
     ];
 
-    store.upsert({
+    await store.upsert({
       indexName: "test",
       vectors: entries.map((_, i) => deterministicVector(i, dim)),
       metadata: entries.map((e) => ({
@@ -37,11 +37,11 @@ describe("retrieveForAgent", () => {
   }
 
   it("should retrieve chunks matching section filter", async () => {
-    setupStore();
+    await setupStore();
     const config: RetrievalConfig = {
       queries: ["technical specs"],
       sectionFilter: ["technical_requirements", "timeline"],
-      scoreThreshold: -1, // Accept all
+      scoreThreshold: -1,
     };
 
     const mockEmbed = vi.fn(async () => deterministicVector(0, dim));
@@ -52,42 +52,35 @@ describe("retrieveForAgent", () => {
   });
 
   it("should deduplicate across multiple queries keeping highest score", async () => {
-    setupStore();
+    await setupStore();
     const config: RetrievalConfig = {
       queries: ["query1", "query2"],
       topK: 10,
       scoreThreshold: -1,
     };
 
-    let callCount = 0;
-    const mockEmbed = vi.fn(async () => {
-      callCount++;
-      return deterministicVector(0, dim); // Same vector = same results
-    });
-
+    const mockEmbed = vi.fn(async () => deterministicVector(0, dim));
     const results = await retrieveForAgent(store, "test", config, mockEmbed);
     expect(mockEmbed).toHaveBeenCalledTimes(2);
 
-    // Should have unique ids (deduped)
     const ids = results.map((r) => r.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
   it("should respect score threshold", async () => {
-    setupStore();
+    await setupStore();
     const config: RetrievalConfig = {
       queries: ["test"],
-      scoreThreshold: 0.99, // Very high threshold
+      scoreThreshold: 0.99,
     };
 
     const mockEmbed = vi.fn(async () => deterministicVector(99, dim));
     const results = await retrieveForAgent(store, "test", config, mockEmbed);
-    // With a high threshold, few or no results should pass
     expect(results.length).toBeLessThanOrEqual(5);
   });
 
   it("should return chunks with correct metadata structure", async () => {
-    setupStore();
+    await setupStore();
     const config: RetrievalConfig = {
       queries: ["test"],
       scoreThreshold: -1,
