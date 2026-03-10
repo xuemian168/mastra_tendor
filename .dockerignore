@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.mastra/
+frontend/
+docs/
+.env
+.env.*
+*.md
+src/__tests__/
+src/eval/
+.git/
