@@ -12,4 +12,4 @@ COPY tsconfig.json ./
 
 EXPOSE 4111
 
-CMD ["npx", "mastra", "dev", "--port", "4111"]
+CMD ["npx", "mastra", "dev"]
