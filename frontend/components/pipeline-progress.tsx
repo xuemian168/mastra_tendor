@@ -78,8 +78,8 @@ const CONNECTOR_STYLES: Record<StageStatus, string> = {
 
 export function PipelineProgress({ toolCalls }: PipelineProgressProps) {
   return (
-    <div className="my-3 rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-3 not-prose">
-      <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)] mb-3">
+    <div className="my-3 rounded-lg border border-border/60 bg-background px-4 py-3 shadow-[var(--shadow-sm)] not-prose">
+      <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
         Analysis Pipeline
       </div>
       <div className="flex items-center gap-1">

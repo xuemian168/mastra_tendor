@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
 import {
   type CompanyProfile,
   loadProfile,
@@ -43,11 +44,11 @@ export function CompanyProfileDialog({ open, onClose, onSave }: Props) {
     <div
       ref={backdropRef}
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
     >
-      <div className="w-full max-w-lg rounded-xl border border-[var(--border)] bg-[var(--background)] p-6 shadow-xl">
+      <div className="w-full max-w-lg animate-in fade-in zoom-in-95 duration-200 rounded-2xl border border-border/60 bg-card p-6 shadow-[var(--shadow-lg)]">
         <h2 className="mb-4 text-lg font-semibold">Company Profile</h2>
-        <p className="mb-4 text-sm text-[var(--muted-foreground)]">
+        <p className="mb-4 text-sm text-muted-foreground">
           Configure your company details once. They will be automatically used
           as context for all tender analyses.
         </p>
@@ -58,7 +59,7 @@ export function CompanyProfileDialog({ open, onClose, onSave }: Props) {
           value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
           placeholder="e.g. Nexus Digital Solutions"
-          className="mb-4 w-full rounded-lg border border-[var(--border)] bg-[var(--muted)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--primary)]"
+          className="mb-4 w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm shadow-[var(--shadow-sm)] outline-none transition-all duration-150 focus:border-primary/40 focus:shadow-[var(--shadow-md)] focus:ring-2 focus:ring-primary/15"
         />
 
         <label className="mb-1 block text-sm font-medium">
@@ -69,22 +70,16 @@ export function CompanyProfileDialog({ open, onClose, onSave }: Props) {
           onChange={(e) => setDescription(e.target.value)}
           placeholder={`Include: industry, size, certifications, past projects, technology expertise, known limitations...\n\ne.g. Mid-tier Australian IT consultancy, 85 employees, ISO 27001:2022 certified...`}
           rows={10}
-          className="mb-4 w-full rounded-lg border border-[var(--border)] bg-[var(--muted)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--primary)]"
+          className="mb-4 w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm shadow-[var(--shadow-sm)] outline-none transition-all duration-150 focus:border-primary/40 focus:shadow-[var(--shadow-md)] focus:ring-2 focus:ring-primary/15"
         />
 
         <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm hover:bg-[var(--muted)] transition-colors"
-          >
+          <Button variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-[var(--primary-foreground)] hover:opacity-90 transition-opacity"
-          >
+          </Button>
+          <Button onClick={handleSave}>
             Save
-          </button>
+          </Button>
         </div>
       </div>
     </div>

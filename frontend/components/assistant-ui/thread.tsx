@@ -35,6 +35,7 @@ import {
   MoreHorizontalIcon,
   PencilIcon,
   RefreshCwIcon,
+  SparklesIcon,
   SquareIcon,
 } from "lucide-react";
 import type { FC } from "react";
@@ -44,7 +45,7 @@ export const Thread: FC = () => {
     <ThreadPrimitive.Root
       className="aui-root aui-thread-root @container flex h-full flex-col bg-background"
       style={{
-        ["--thread-max-width" as string]: "44rem",
+        ["--thread-max-width" as string]: "min(56rem, 100%)",
       }}
     >
       <ThreadPrimitive.Viewport
@@ -63,7 +64,7 @@ export const Thread: FC = () => {
           }}
         />
 
-        <ThreadPrimitive.ViewportFooter className="aui-thread-viewport-footer sticky bottom-0 mx-auto mt-auto flex w-full max-w-(--thread-max-width) flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6">
+        <ThreadPrimitive.ViewportFooter className="aui-thread-viewport-footer relative sticky bottom-0 mx-auto mt-auto flex w-full max-w-(--thread-max-width) flex-col gap-4 overflow-visible rounded-t-3xl bg-background px-4 pb-4 before:pointer-events-none before:absolute before:-top-12 before:left-0 before:right-0 before:h-12 before:bg-gradient-to-t before:from-background before:to-transparent md:pb-6">
           <ThreadScrollToBottom />
           <Composer />
         </ThreadPrimitive.ViewportFooter>
@@ -90,11 +91,14 @@ const ThreadWelcome: FC = () => {
   return (
     <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-(--thread-max-width) grow flex-col">
       <div className="aui-thread-welcome-center flex w-full grow flex-col items-center justify-center">
-        <div className="aui-thread-welcome-message flex size-full flex-col justify-center px-4">
-          <h1 className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-semibold text-2xl duration-200">
+        <div className="aui-thread-welcome-message flex flex-col items-center justify-center px-4 text-center">
+          <div className="fade-in slide-in-from-bottom-1 animate-in fill-mode-both mb-4 flex size-16 items-center justify-center rounded-2xl bg-primary/10 shadow-[var(--shadow-md)] duration-200">
+            <SparklesIcon className="size-8 text-primary" />
+          </div>
+          <h1 className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-3xl font-bold tracking-tight duration-200">
             Analysis Assistant
           </h1>
-          <p className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-muted-foreground text-base delay-75 duration-200">
+          <p className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both mt-2 max-w-md text-muted-foreground text-base delay-75 duration-200">
             Ask me anything, or upload a document for deep analysis.
           </p>
         </div>
@@ -128,7 +132,7 @@ const ThreadSuggestions: FC = () => {
           prompt={s.text}
           method="replace"
           autoSend={false}
-          className="fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-200 h-auto w-full flex-wrap items-start justify-start gap-1 rounded-2xl border px-4 py-3 text-left text-sm transition-colors hover:bg-muted"
+          className="fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-200 h-auto w-full flex-wrap items-start justify-start gap-1 rounded-2xl border border-border/60 bg-card px-4 py-3 text-left text-sm shadow-[var(--shadow-sm)] transition-all hover:border-primary/30 hover:bg-accent hover:shadow-[var(--shadow-md)] active:scale-[0.98]"
         >
           <span className="font-medium">{s.text}</span>
         </ThreadPrimitive.Suggestion>
@@ -144,7 +148,7 @@ const Composer: FC = () => {
     <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
       <ComposerAttachments />
 
-      <div className="flex w-full flex-col rounded-2xl border border-input bg-background px-1 pt-2 outline-none transition-shadow has-[textarea:focus-visible]:border-ring has-[textarea:focus-visible]:ring-2 has-[textarea:focus-visible]:ring-ring/20">
+      <div className="flex w-full flex-col rounded-2xl border border-border/60 bg-card px-1 pt-2 shadow-[var(--shadow-md)] outline-none transition-all duration-200 has-[textarea:focus-visible]:border-ring has-[textarea:focus-visible]:shadow-[var(--shadow-lg)] has-[textarea:focus-visible]:ring-2 has-[textarea:focus-visible]:ring-ring/20">
         <ComposerPrimitive.Input
           placeholder="Ask a question or upload a document..."
           className="aui-composer-input mb-1 max-h-32 min-h-14 w-full resize-none bg-transparent px-4 pt-2 pb-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-0"
@@ -163,7 +167,7 @@ const Composer: FC = () => {
                 type="button"
                 variant="default"
                 size="icon"
-                className="aui-composer-send size-8 rounded-full"
+                className="aui-composer-send size-8 rounded-full transition-all duration-150 hover:scale-105 active:scale-95"
                 aria-label="Send message"
               >
                 <ArrowUpIcon className="aui-composer-send-icon size-4" />
@@ -297,7 +301,7 @@ const UserMessage: FC = () => {
     >
       <UserMessageAttachments />
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-        <div className="aui-user-message-content wrap-break-word rounded-2xl bg-muted px-4 py-2.5 text-foreground">
+        <div className="aui-user-message-content wrap-break-word rounded-2xl bg-primary px-4 py-2.5 text-primary-foreground">
           <MessagePrimitive.Parts components={{ Text: MarkdownText }} />
         </div>
         <div className="aui-user-action-bar-wrapper absolute top-1/2 left-0 -translate-x-full -translate-y-1/2 pr-2">
