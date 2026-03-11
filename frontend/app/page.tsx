@@ -32,17 +32,22 @@ export default function Home() {
     transport,
     adapters: { attachments: documentAttachmentAdapter },
   });
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [profile, setProfile] = useState<CompanyProfile>({
     companyName: "",
     description: "",
   });
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  const hasProfile = profile.description.trim().length > 0;
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
-    setProfile(loadProfile());
+    const loaded = loadProfile();
+    setProfile(loaded);
+    setProfileLoaded(true);
+    if (!loaded.description.trim()) {
+      setDialogOpen(true);
+    }
   }, []);
-
-  const hasProfile = profile.description.trim().length > 0;
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
@@ -50,39 +55,44 @@ export default function Home() {
       <RegisterToolUIs />
       <TooltipProvider>
         <SidebarProvider>
-          <div className="flex h-screen">
+          <div className="flex h-dvh overflow-hidden bg-background">
             <Sidebar />
-            <main className="flex min-w-0 flex-1 flex-col">
-              <header className="flex items-center justify-between border-b border-border/60 bg-background/80 px-4 py-3 shadow-[var(--shadow-sm)] backdrop-blur-lg">
-                <div className="flex items-center gap-3">
+            <main className="flex min-w-0 flex-1 flex-col relative">
+              <header className="flex shrink-0 items-center justify-between bg-background/80 px-6 md:px-12 lg:px-16 py-4 md:py-6 backdrop-blur-lg z-20">
+                <div className="flex items-center gap-4">
                   <SidebarToggle />
-                  <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10">
-                    <SparklesIcon className="size-4 text-primary" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex size-6 items-center justify-center rounded-md bg-primary/10">
+                      <SparklesIcon className="size-3.5 text-primary" />
+                    </div>
+                    <h1 className="text-sm font-medium text-foreground/80 tracking-tight">Analysis Assistant</h1>
                   </div>
-                  <h1 className="text-lg font-semibold">Analysis Assistant</h1>
                 </div>
-                {hasProfile ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setDialogOpen(true)}
-                  >
-                    <Building2Icon className="mr-1.5 size-3.5" />
-                    {profile.companyName}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setDialogOpen(true)}
-                    className="border-destructive text-destructive hover:bg-destructive/10"
-                  >
-                    <Building2Icon className="mr-1.5 size-3.5" />
-                    Set Company Profile
-                  </Button>
-                )}
+                <div className="flex items-center gap-3">
+                  {hasProfile ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDialogOpen(true)}
+                      className="h-8 gap-2 rounded-full border border-border/40 px-3 text-xs font-medium hover:bg-accent"
+                    >
+                      <Building2Icon className="size-3.5 text-muted-foreground" />
+                      {profile.companyName}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDialogOpen(true)}
+                      className="h-8 gap-2 rounded-full border border-destructive/20 px-3 text-xs font-medium text-destructive hover:bg-destructive/5"
+                    >
+                      <Building2Icon className="size-3.5" />
+                      Set Company Profile
+                    </Button>
+                  )}
+                </div>
               </header>
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden relative">
                 <Thread />
               </div>
             </main>
@@ -93,6 +103,7 @@ export default function Home() {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onSave={setProfile}
+        required={!hasProfile}
       />
     </AssistantRuntimeProvider>
   );

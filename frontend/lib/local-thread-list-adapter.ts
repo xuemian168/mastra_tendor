@@ -6,6 +6,7 @@ import type {
 } from "@assistant-ui/core";
 import type { ThreadMessage } from "@assistant-ui/core";
 import { createAssistantStream } from "assistant-stream";
+import { deleteMessages } from "./message-store";
 
 const STORAGE_KEY = "aui-threads";
 
@@ -74,6 +75,7 @@ export class LocalThreadListAdapter implements RemoteThreadListAdapter {
   async delete(remoteId: string): Promise<void> {
     const threads = readThreads();
     writeThreads(threads.filter((t) => t.remoteId !== remoteId));
+    deleteMessages(remoteId);
   }
 
   async generateTitle(

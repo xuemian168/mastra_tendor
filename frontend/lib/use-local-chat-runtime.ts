@@ -13,8 +13,9 @@ import {
   AssistantChatTransport,
 } from "@assistant-ui/react-ai-sdk";
 import { type ChatInit, type ChatTransport } from "ai";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { LocalThreadListAdapter } from "./local-thread-list-adapter";
+import { loadMessages, saveMessages } from "./message-store";
 
 type RuntimeAdapters =
   | (NonNullable<ExternalStoreAdapter["adapters"]> & {
@@ -71,6 +72,27 @@ export const useLocalChatRuntime = <
         id,
         transport,
       });
+
+      // Restore messages from localStorage when switching threads
+      const prevIdRef = useRef(id);
+      useEffect(() => {
+        if (prevIdRef.current !== id) {
+          prevIdRef.current = id;
+          const stored = loadMessages(id);
+          if (stored.length > 0 && chat.messages.length === 0) {
+            chat.setMessages(stored as UI_MESSAGE[]);
+          }
+        }
+      }, [id, chat.messages.length, chat.setMessages]);
+
+      // Persist messages to localStorage when they change
+      const prevLenRef = useRef(chat.messages.length);
+      useEffect(() => {
+        if (chat.messages.length > 0 && chat.messages.length !== prevLenRef.current) {
+          prevLenRef.current = chat.messages.length;
+          saveMessages(id, chat.messages);
+        }
+      }, [id, chat.messages]);
 
       const runtime = useAISDKRuntime(chat, { adapters });
 

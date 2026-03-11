@@ -124,7 +124,7 @@ const defaultComponents = memoizeMarkdownComponents({
   p: ({ className, ...props }) => (
     <p
       className={cn(
-        "aui-md-p my-2.5 leading-normal first:mt-0 last:mb-0",
+        "aui-md-p my-4 leading-7 text-[15.5px] font-normal first:mt-0 last:mb-0",
         className,
       )}
       {...props}
@@ -151,7 +151,7 @@ const defaultComponents = memoizeMarkdownComponents({
   ul: ({ className, ...props }) => (
     <ul
       className={cn(
-        "aui-md-ul my-2 ml-4 list-disc marker:text-muted-foreground [&>li]:mt-1",
+        "aui-md-ul my-4 ml-6 list-disc marker:text-muted-foreground/60 [&>li]:mt-2",
         className,
       )}
       {...props}
@@ -160,7 +160,7 @@ const defaultComponents = memoizeMarkdownComponents({
   ol: ({ className, ...props }) => (
     <ol
       className={cn(
-        "aui-md-ol my-2 ml-4 list-decimal marker:text-muted-foreground [&>li]:mt-1",
+        "aui-md-ol my-4 ml-6 list-decimal marker:text-muted-foreground/60 [&>li]:mt-2",
         className,
       )}
       {...props}

@@ -12,9 +12,11 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onSave: (profile: CompanyProfile) => void;
+  /** When true, Cancel and backdrop dismiss are disabled — user must save. */
+  required?: boolean;
 }
 
-export function CompanyProfileDialog({ open, onClose, onSave }: Props) {
+export function CompanyProfileDialog({ open, onClose, onSave, required = false }: Props) {
   const [companyName, setCompanyName] = useState("");
   const [description, setDescription] = useState("");
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -29,7 +31,10 @@ export function CompanyProfileDialog({ open, onClose, onSave }: Props) {
 
   if (!open) return null;
 
+  const canSave = companyName.trim().length > 0 && description.trim().length > 0;
+
   const handleSave = () => {
+    if (!canSave) return;
     const profile: CompanyProfile = { companyName, description };
     saveProfile(profile);
     onSave(profile);
@@ -37,6 +42,7 @@ export function CompanyProfileDialog({ open, onClose, onSave }: Props) {
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
+    if (required) return;
     if (e.target === backdropRef.current) onClose();
   };
 
@@ -49,8 +55,9 @@ export function CompanyProfileDialog({ open, onClose, onSave }: Props) {
       <div className="w-full max-w-lg animate-in fade-in zoom-in-95 duration-200 rounded-2xl border border-border/60 bg-card p-6 shadow-[var(--shadow-lg)]">
         <h2 className="mb-4 text-lg font-semibold">Company Profile</h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          Configure your company details once. They will be automatically used
-          as context for all tender analyses.
+          {required
+            ? "Please set up your company profile before starting. This information will be used as context for all analyses."
+            : "Configure your company details once. They will be automatically used as context for all tender analyses."}
         </p>
 
         <label className="mb-1 block text-sm font-medium">Company Name</label>
@@ -74,10 +81,12 @@ export function CompanyProfileDialog({ open, onClose, onSave }: Props) {
         />
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>
+          {!required && (
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+          )}
+          <Button onClick={handleSave} disabled={!canSave}>
             Save
           </Button>
         </div>

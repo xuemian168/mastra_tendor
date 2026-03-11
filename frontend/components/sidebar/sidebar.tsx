@@ -12,7 +12,7 @@ export const Sidebar: FC = () => {
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 bg-background/60 backdrop-blur-md md:hidden transition-opacity duration-300"
           onClick={close}
         />
       )}
@@ -20,13 +20,13 @@ export const Sidebar: FC = () => {
       {/* Sidebar */}
       <aside
         className={`
-          ${isOpen ? "translate-x-0 shadow-[var(--shadow-lg)]" : "-translate-x-full"}
-          fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col border-r border-sidebar-border/60 bg-sidebar transition-transform duration-200 ease-in-out
-          md:relative md:z-auto md:shadow-none md:transition-[width] md:duration-200
-          ${isOpen ? "md:w-[260px]" : "md:w-0 md:translate-x-0 md:overflow-hidden md:border-r-0"}
+          ${isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"}
+          fixed inset-y-0 left-0 z-50 flex w-[300px] flex-col border-r border-border/10 bg-sidebar/95 backdrop-blur-xl transition-all duration-300 ease-in-out
+          md:relative md:z-auto md:shadow-none
+          ${isOpen ? "md:w-[300px]" : "md:w-0 md:translate-x-0 md:overflow-hidden md:border-r-0"}
         `}
       >
-        <div className="flex w-[260px] flex-1 flex-col overflow-hidden">
+        <div className="flex w-[300px] flex-1 flex-col overflow-hidden">
           <ThreadList />
         </div>
       </aside>
