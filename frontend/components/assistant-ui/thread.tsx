@@ -144,7 +144,7 @@ const ThreadSuggestions: FC = () => {
           prompt={`${s.text} ${s.subtext}`}
           method="replace"
           autoSend={false}
-          className="fade-in slide-in-from-bottom-2 animate-in fill-mode-both h-full w-full flex-col items-start justify-start gap-1 rounded-2xl border border-border/40 bg-card/40 p-6 text-left transition-all hover:border-primary/20 hover:bg-accent/50 hover:shadow-sm active:scale-[0.98]"
+          className="fade-in slide-in-from-bottom-2 animate-in fill-mode-both flex h-full w-full flex-col items-start justify-start gap-1 rounded-2xl border border-border/40 bg-card/40 p-6 text-left transition-all hover:border-primary/20 hover:bg-accent/50 hover:shadow-sm active:scale-[0.98]"
           style={{ animationDelay: `${300 + i * 50}ms` }}
         >
           <span className="text-sm font-medium leading-snug">{s.text}</span>
