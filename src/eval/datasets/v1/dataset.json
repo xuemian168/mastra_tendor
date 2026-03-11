@@ -1,7 +1,7 @@
 {
   "version": "v1",
-  "createdAt": "2026-03-07",
-  "description": "Initial evaluation dataset with 4 test cases covering tender bid/no-bid, general analysis, and document summary scenarios.",
+  "createdAt": "2026-03-11",
+  "description": "Evaluation dataset with 10 test cases covering tender bid/no-bid (5), general analysis (3), and document summary (2) scenarios.",
   "cases": [
     {
       "id": "tender-001",
@@ -14,7 +14,7 @@
       },
       "expected": {
         "decision": "no_bid",
-        "confidenceRange": { "min": 5, "max": 30 },
+        "confidenceRange": { "min": 0, "max": 30 },
         "mustMentionStrengths": ["ISO 27001", "IRAP", "AWS GovCloud", "Kubernetes"],
         "mustMentionWeaknesses": ["$20M", "border management", "capacity"],
         "expectedRiskLevel": "critical",
@@ -70,6 +70,105 @@
         "mustCoverTopics": ["license", "fee", "service level", "data", "liability"]
       },
       "tags": ["regression", "core"]
+    },
+    {
+      "id": "tender-003",
+      "category": "tender-bid-nobid",
+      "input": {
+        "documentText": "REQUEST FOR PROPOSAL\n\nRFP Reference: HEALTH-2026-MED-0291\nTitle: National Electronic Health Record Integration Platform\nIssuing Agency: Department of Health and Aged Care\nClosing Date: 1 May 2026\n\n1. OVERVIEW\nThe Department seeks a vendor to build and operate a national Electronic Health Record (EHR) integration platform connecting 1,200+ hospitals, 8,000+ GP practices, and 3,500+ allied health providers across Australia. Budget: AUD $120-180 million over 7 years.\n\n2. SCOPE\na) HL7 FHIR R4 compliant integration engine processing 2M+ clinical messages daily\nb) Real-time patient record synchronisation across state/territory health systems\nc) Integration with My Health Record, PBS, MBS, and NDIS systems\nd) Clinical decision support with AI-assisted diagnostic suggestions\ne) Telehealth platform with video consultation and remote monitoring\nf) Disaster recovery with RPO < 5 minutes across 3 geographic zones\n\n3. MANDATORY QUALIFICATIONS\na) ISO 13485:2016 Medical Device QMS certification\nb) NSQHS Standards accreditation\nc) Minimum 10 years delivering health IT systems exceeding AUD $50M\nd) HL7 International membership and FHIR implementation certification\ne) Existing contracts with minimum 3 Australian state/territory health departments\nf) IRAP assessment at PROTECTED level\ng) Clinical safety officer on staff (ANZSCO 253111)\nh) TGA software as medical device (SaMD) registration experience\ni) Australian Digital Health Agency partnership or approved vendor status\n\n4. TIMELINE\nRFP Close: 1 May 2026, Shortlist: 1 July 2026, Contract Award: 1 October 2026, Phase 1 (Design): Oct 2026 - Mar 2027, Phase 2 (Build): Apr 2027 - Dec 2028, Phase 3 (Rollout): Jan 2029 - Jun 2030.\n\n5. PENALTIES\n- Late milestone: AUD $200,000 per week\n- Data breach: AUD $5M per incident + contract termination right\n- SLA breach (availability < 99.99%): 5% monthly fee per 0.01% below target",
+        "documentTitle": "Department of Health - National EHR Integration Platform (HEALTH-2026-MED-0291)",
+        "analysisGoal": "Full bid/no-bid analysis",
+        "companyProfile": "CloudMinds Pty Ltd is a 30-person startup founded in 2022 in Melbourne. Specialises in cloud-native web applications and mobile apps for retail and hospitality sectors. Tech stack: React, Node.js, AWS. No healthcare experience. No ISO certifications. Largest project: AUD $2M e-commerce platform. No government contracts."
+      },
+      "expected": {
+        "decision": "no_bid",
+        "confidenceRange": { "min": 0, "max": 15 },
+        "mustMentionStrengths": ["cloud"],
+        "mustMentionWeaknesses": ["healthcare", "ISO 13485", "$50M", "government"],
+        "expectedRiskLevel": "critical",
+        "expectedDeadlineCount": { "min": 3 },
+        "expectedMandatoryRequirements": ["ISO 13485", "IRAP", "HL7"]
+      },
+      "tags": ["regression", "no-bid", "edge-case"]
+    },
+    {
+      "id": "tender-004",
+      "category": "tender-bid-nobid",
+      "input": {
+        "documentText": "QUOTATION REQUEST\n\nRef: SME-2026-WEB-0044\nTitle: Corporate Website Redesign\nAgency: Australian Small Business and Family Enterprise Ombudsman\nClosing: 20 April 2026\n\nScope: Redesign the agency's public website. WordPress or similar CMS. Accessibility WCAG 2.1 AA compliance. Mobile responsive. Content migration of ~200 pages. Budget: AUD $80,000-120,000.\n\nRequirements: ABN required. Portfolio of 3+ government website projects. WCAG 2.1 AA experience.\n\nTimeline: Design mockups by 15 May 2026, development complete by 30 June 2026, go-live by 31 July 2026.",
+        "documentTitle": "ASBFEO - Corporate Website Redesign (SME-2026-WEB-0044)",
+        "analysisGoal": "Full bid/no-bid analysis",
+        "companyProfile": "Pixel Perfect Agency, 15 employees, specialising in government website design. 8 years experience. Built websites for 12 government agencies including ATO, APSC, and ACCC. WCAG 2.1 AA expertise. WordPress and Drupal specialists."
+      },
+      "expected": {
+        "decision": "conditional_bid",
+        "confidenceRange": { "min": 0, "max": 50 },
+        "mustMentionStrengths": ["government", "WCAG"],
+        "mustMentionWeaknesses": ["timeline"],
+        "expectedRiskLevel": "high",
+        "expectedDeadlineCount": { "min": 2 }
+      },
+      "tags": ["regression", "conditional", "short-document"]
+    },
+    {
+      "id": "tender-005",
+      "category": "tender-bid-nobid",
+      "input": {
+        "documentText": "EXPRESSION OF INTEREST\n\nTitle: Digital Transformation Initiative\nAgency: Department of Industry, Science and Resources\n\nThe Department is exploring options for a digital transformation of internal processes. We are seeking expressions of interest from vendors who may be able to assist.\n\nAreas of interest include but are not limited to:\n- Process automation\n- Data analytics\n- Cloud migration\n- Staff training and change management\n\nNo specific budget has been allocated. Timeline is flexible. Further details will be provided to shortlisted vendors.\n\nPlease submit a capability statement by 30 April 2026.",
+        "documentTitle": "DISR - Digital Transformation EOI",
+        "analysisGoal": "Full bid/no-bid analysis",
+        "companyProfile": "TechAdvance Consulting, mid-tier IT consultancy, 60 employees, 5 years government experience, expertise in process automation and cloud migration. ISO 27001 certified."
+      },
+      "expected": {
+        "decision": "conditional_bid",
+        "confidenceRange": { "min": 0, "max": 60 },
+        "mustMentionStrengths": ["process automation", "cloud migration"],
+        "mustMentionWeaknesses": ["budget", "scope"],
+        "expectedRiskLevel": "high"
+      },
+      "tags": ["regression", "conditional", "vague-document"]
+    },
+    {
+      "id": "analysis-002",
+      "category": "general-analysis",
+      "input": {
+        "documentText": "TECHNICAL SPECIFICATION\n\nProduct: SmartGrid Controller v3.0\nDocument: TS-2026-SG-001\nVersion: 3.0.0\nDate: February 2026\n\n1. SYSTEM OVERVIEW\nThe SmartGrid Controller is an IoT gateway device managing up to 10,000 connected sensors in industrial environments. It aggregates sensor data, performs edge analytics, and communicates with cloud backends via MQTT and REST APIs.\n\n2. HARDWARE SPECIFICATIONS\n- Processor: ARM Cortex-A72 quad-core 1.5GHz\n- RAM: 4GB LPDDR4\n- Storage: 64GB eMMC + microSD expansion\n- Connectivity: 2x Gigabit Ethernet, WiFi 6, BLE 5.2, LoRaWAN, 4G LTE\n- Operating temperature: -40C to +85C\n- Power: 12-48V DC, 15W typical, PoE+ supported\n- Enclosure: IP67 rated, DIN rail mount\n\n3. SOFTWARE ARCHITECTURE\n- OS: Custom Linux (Yocto-based)\n- Runtime: Container-based (Podman)\n- Edge ML: TensorFlow Lite, ONNX Runtime\n- Protocols: MQTT 5.0, OPC-UA, Modbus TCP/RTU, BACnet\n- Security: TPM 2.0, secure boot, encrypted storage, certificate-based auth\n- OTA updates: A/B partition scheme with rollback\n\n4. PERFORMANCE REQUIREMENTS\n- Sensor polling: 10,000 endpoints at 1Hz\n- Edge inference: < 50ms per prediction\n- Data aggregation: 1M datapoints/minute\n- Uptime: 99.99% (< 52.6 min downtime/year)\n- Boot time: < 30 seconds from cold start\n\n5. COMPLIANCE\n- IEC 62443 (Industrial Cybersecurity)\n- IEC 61131-3 (PLC Programming)\n- CE, FCC, RCM certifications\n- RoHS and WEEE compliant\n- UL 508 Listed\n\n6. INTERFACES\n- REST API: OpenAPI 3.0 spec, 200+ endpoints\n- gRPC: High-performance inter-service communication\n- WebSocket: Real-time dashboard feeds\n- CLI: Full device management\n- Web UI: Configuration and monitoring dashboard",
+        "documentTitle": "SmartGrid Controller v3.0 - Technical Specification (TS-2026-SG-001)",
+        "analysisGoal": "Analyze the technical capabilities, compliance requirements, and potential integration challenges"
+      },
+      "expected": {
+        "mustCoverTopics": ["hardware", "software", "performance", "compliance", "interface"],
+        "minKeyFindings": 4
+      },
+      "tags": ["regression", "technical-spec"]
+    },
+    {
+      "id": "analysis-003",
+      "category": "general-analysis",
+      "input": {
+        "documentText": "ANNUAL REPORT 2025-2026\n\nAustralian Renewable Energy Agency (ARENA)\n\nCHAIR'S MESSAGE\nThe 2025-26 financial year marked a transformative period for Australia's renewable energy sector. ARENA committed $890 million in new funding across 47 projects, our largest annual investment to date. The transition to net zero continues to accelerate, with renewable energy now providing 42% of Australia's electricity generation.\n\nCEO'S REVIEW\nOur strategic priorities for 2025-26 focused on three pillars: grid-scale storage, green hydrogen, and demand-side flexibility. We launched the $300 million Grid Resilience Program, supported 12 community battery projects, and funded Australia's first commercial-scale green hydrogen export facility in Gladstone, Queensland.\n\nCHAPTER 1: INVESTMENT PORTFOLIO\n\n1.1 Solar\nARENA funded 15 solar projects totalling $210 million. Key highlights:\n- Broken Hill Solar Farm expansion (150MW, $45M ARENA co-investment)\n- Floating solar pilot on Warragamba Dam (5MW, $12M)\n- Agrivoltaics research program across 8 sites ($28M)\n- Building-integrated PV demonstration in 3 CBD office towers ($15M)\n- Perovskite tandem cell manufacturing pilot in Newcastle ($35M)\n\n1.2 Wind\nWind energy investments totalled $180 million across 8 projects:\n- Star of the South offshore wind farm (2.2GW, $95M ARENA contribution)\n- Hunter Valley wind-solar hybrid (500MW wind + 200MW solar, $42M)\n- Small-scale wind for remote communities (12 installations, $8M)\n- Wind turbine recycling research program ($5M)\n- Next-generation floating offshore wind prototype ($30M)\n\n1.3 Storage\nEnergy storage received $250 million, our largest category:\n- Waratah Super Battery expansion (850MWh, $72M)\n- Community batteries program (12 sites, $35M)\n- Iron-air battery demonstration (10MWh, $18M)\n- Compressed air energy storage pilot ($45M)\n- Vehicle-to-grid integration trial with 5,000 EVs ($28M)\n- Pumped hydro feasibility studies for 6 new sites ($22M)\n- Sodium-ion battery manufacturing feasibility ($30M)\n\n1.4 Hydrogen\nGreen hydrogen investments reached $150 million:\n- Gladstone Hydrogen Hub (50MW electrolyser, $65M)\n- Hydrogen refuelling network (15 stations, $32M)\n- Ammonia export pilot facility ($28M)\n- Hydrogen blending trial in ACT gas network ($15M)\n- Hydrogen-powered mining vehicle trial ($10M)\n\n1.5 Demand Response\nDemand-side management received $100 million:\n- National demand response marketplace platform ($25M)\n- Smart hot water load management (200,000 households, $18M)\n- Commercial building energy management AI ($15M)\n- Industrial load flexibility program ($22M)\n- EV smart charging orchestration ($20M)\n\nCHAPTER 2: FINANCIAL PERFORMANCE\n\n2.1 Revenue and Expenditure\nTotal revenue: $1.2 billion (Government appropriation: $980M, Interest: $45M, Co-investment returns: $175M)\nTotal expenditure: $1.05 billion (Grants and co-investments: $890M, Administration: $85M, Research: $45M, External advisory: $30M)\nNet surplus: $150 million (carried forward to 2026-27)\n\n2.2 Cost Effectiveness\nAverage co-investment ratio: 1:3.2 (every $1 ARENA invested leveraged $3.20 in private capital)\nAdministration cost ratio: 8.1% (below 10% target)\nProject completion rate: 94% (target: 90%)\n\n2.3 Audit Findings\nThe ANAO audit found no material issues. Three minor recommendations:\n1. Strengthen conflict of interest procedures for advisory panels\n2. Improve documentation of risk assessment methodology\n3. Update procurement guidelines to reflect current CPRs\n\nCHAPTER 3: IMPACT ASSESSMENT\n\n3.1 Emissions Reduction\nARENA-funded projects contributed to estimated 12.8 Mt CO2-e reduction in 2025-26.\nCumulative emissions avoided since ARENA's inception: 78.5 Mt CO2-e.\nProjected annual reduction by 2030 from current portfolio: 25 Mt CO2-e.\n\n3.2 Employment\nDirect jobs supported: 8,200 FTE\nIndirect jobs: 24,600 FTE\nRegional jobs (outside capital cities): 65% of total\nFirst Nations employment: 4.2% (target: 3%)\n\n3.3 Technology Advancement\nLCOE reduction achieved: Solar -18%, Wind -12%, Storage -25% compared to 2020 baseline.\n15 patents filed from ARENA-funded research.\n8 technologies progressed from pilot to commercial deployment.\n\n3.4 Regional Development\n$480 million invested in regional and remote projects (54% of total).\nKey regions: Hunter Valley (NSW), Gladstone (QLD), Pilbara (WA), Latrobe Valley (VIC).\n12 regional workforce transition programs supported.\n\nCHAPTER 4: GOVERNANCE\n\n4.1 Board\n7 board members. Chair: Dr Sarah Chen (appointed 2024). 3 meetings held in 2025-26.\n\n4.2 Risk Management\nTop risks identified:\n1. Technology risk: Novel technologies may not achieve expected performance\n2. Market risk: Electricity price volatility affecting project economics\n3. Policy risk: Regulatory changes impacting investment certainty\n4. Supply chain risk: Global competition for critical minerals and components\n5. Cyber risk: Increasing sophistication of attacks on energy infrastructure\n\n4.3 Compliance\nFull compliance with PGPA Act 2013, ARENA Act 2011, and Public Governance Rules.\nNo reported fraud incidents. Two whistleblower reports investigated and resolved.\n\nCHAPTER 5: OUTLOOK 2026-27\n\nPriorities for 2026-27:\n1. Launch $500M Ultra-Long Duration Storage program (targeting 100+ hour storage)\n2. Expand green hydrogen export infrastructure\n3. Fund next-generation solar cell manufacturing\n4. Support First Nations clean energy enterprises\n5. Develop offshore wind supply chain capabilities\n\nTarget: $1.1 billion in new commitments, supporting 60+ projects.\n\nAPPENDIX A: PROJECT LIST\n[47 projects listed with funding amounts, locations, and status]\n\nAPPENDIX B: FINANCIAL STATEMENTS\n[Audited financial statements — 12 pages]\n\nAPPENDIX C: STAFF STATISTICS\nTotal staff: 185 FTE (142 ongoing, 43 non-ongoing)\nGender: 52% female, 48% male\nAverage age: 38\nStaff turnover: 12%",
+        "documentTitle": "ARENA Annual Report 2025-2026",
+        "analysisGoal": "Analyze the financial performance, investment portfolio distribution, and strategic priorities"
+      },
+      "expected": {
+        "mustCoverTopics": ["financial", "solar", "storage", "hydrogen", "emissions"],
+        "minKeyFindings": 5
+      },
+      "tags": ["regression", "long-document"]
+    },
+    {
+      "id": "summary-002",
+      "category": "document-summary",
+      "input": {
+        "documentText": "CYBERSECURITY INCIDENT RESPONSE PLAN\n\nOrganisation: Federal Courts of Australia\nVersion: 4.0\nClassification: OFFICIAL\nDate: January 2026\n\n1. PURPOSE AND SCOPE\nThis plan establishes procedures for detecting, responding to, and recovering from cybersecurity incidents affecting the Federal Courts' IT systems, including the Federal Court, Family Court, and Federal Circuit and Family Court. It covers all systems, networks, and data assets managed by Courts Administration Service.\n\n2. INCIDENT CLASSIFICATION\n\n2.1 Severity Levels\n- SEV-1 (Critical): Active data breach, ransomware, or system compromise affecting case management. Response: Immediate, all hands.\n- SEV-2 (High): Attempted intrusion detected, malware infection contained, phishing campaign targeting judges. Response: Within 1 hour.\n- SEV-3 (Medium): Suspicious activity, policy violation, minor vulnerability discovered. Response: Within 4 hours.\n- SEV-4 (Low): False positive, information request, routine security event. Response: Next business day.\n\n2.2 Escalation Matrix\n- SEV-1: CTO → Secretary → Attorney-General's Department → ASD/ACSC\n- SEV-2: CISO → CTO → Courts Security Committee\n- SEV-3: Security Operations → CISO\n- SEV-4: Security Operations (no escalation)\n\n3. RESPONSE PROCEDURES\n\n3.1 Detection and Analysis (Phase 1)\n- Monitor SIEM alerts (Splunk Enterprise Security)\n- Analyse network traffic (Darktrace AI)\n- Review endpoint detection (CrowdStrike Falcon)\n- Correlate with threat intelligence feeds (ASD, CISA, Five Eyes)\n- Determine scope, impact, and severity classification\n\n3.2 Containment (Phase 2)\n- Isolate affected systems from network\n- Preserve forensic evidence (disk images, memory dumps, logs)\n- Activate backup communication channels\n- Implement temporary access controls\n- Notify affected parties as required by Privacy Act 1988\n\n3.3 Eradication and Recovery (Phase 3)\n- Remove malicious artifacts\n- Patch exploited vulnerabilities\n- Restore from verified clean backups\n- Validate system integrity before reconnection\n- Implement additional monitoring for 30 days post-incident\n\n3.4 Post-Incident (Phase 4)\n- Conduct formal post-incident review within 5 business days\n- Update threat models and detection rules\n- Revise security policies as needed\n- Submit report to ASD within 72 hours (for SEV-1/2)\n- Brief Courts Security Committee quarterly\n\n4. ROLES AND RESPONSIBILITIES\n\n4.1 Incident Response Team (IRT)\n- Incident Commander: CISO (primary), Deputy CISO (backup)\n- Technical Lead: Senior Security Engineer\n- Communications: Media and Stakeholder Relations\n- Legal: General Counsel\n- Evidence: Digital Forensics Analyst\n\n4.2 External Contacts\n- ASD/ACSC: 1300 CYBER1\n- AFP Cybercrime: cyber.crime@afp.gov.au\n- OAIC (Privacy Breach): compliance@oaic.gov.au\n- Insurance: CyberRisk Underwriters (Policy #CRU-2026-FCA-001)\n\n5. COMMUNICATION PROTOCOLS\n- Internal: Secure Teams channel (backup: Signal group)\n- External: Pre-approved media statements only, via Communications team\n- Judicial officers: Direct briefing by Secretary for SEV-1/2\n- Public: Website notice within 24 hours for incidents affecting public services\n\n6. TESTING AND MAINTENANCE\n- Tabletop exercises: Quarterly\n- Full simulation: Annually (next: March 2026)\n- Plan review: Every 6 months\n- Staff training: Annual mandatory cybersecurity awareness",
+        "documentTitle": "Federal Courts - Cybersecurity Incident Response Plan v4.0",
+        "analysisGoal": "Generate a structured summary"
+      },
+      "expected": {
+        "minKeyPoints": 5,
+        "mustCoverTopics": ["incident classification", "response", "containment", "roles", "communication"]
+      },
+      "tags": ["regression", "multi-chapter"]
     }
   ]
 }

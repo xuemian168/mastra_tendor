@@ -56,8 +56,19 @@ export const analyzeComplianceTool = createTool({
         tokenTracker.record("compliance-tool", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
       }
 
+      const output = result.object as Record<string, unknown>;
       tokenTracker.completeStep("compliance-tool");
-      return result.object;
+
+      const stages: string[] = [];
+      if (fullText) {
+        stages.push("Using cached full text");
+      } else {
+        stages.push(`Retrieved relevant chunks from "${inputData.indexName}"`);
+      }
+      stages.push("Analyzing compliance requirements");
+      stages.push("Generated structured compliance report");
+
+      return { ...output, stages };
     } catch (error) {
       tokenTracker.completeStep("compliance-tool");
       return {

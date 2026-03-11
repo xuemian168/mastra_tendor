@@ -33,6 +33,10 @@ export const ingestDocumentTool = createTool({
         indexName,
         documentTitle: inputData.documentTitle,
         message: `Document ingested as full text (${inputData.documentText.length} chars, below RAG threshold).`,
+        stages: [
+          `Received document (${inputData.documentText.length} chars)`,
+          `Below RAG threshold (${RAG_THRESHOLD}) — cached as full text`,
+        ],
       };
     }
 
@@ -57,6 +61,12 @@ export const ingestDocumentTool = createTool({
       indexName,
       documentTitle: inputData.documentTitle,
       message: `Document chunked into ${chunks.length} segments and indexed.`,
+      stages: [
+        `Received document (${inputData.documentText.length} chars)`,
+        `Chunked into ${chunks.length} segments`,
+        `Embedded ${chunks.length} chunks (${DIMENSION}d vectors)`,
+        `Stored in vector index "${indexName}"`,
+      ],
     };
   },
 });

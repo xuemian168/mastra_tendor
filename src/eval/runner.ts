@@ -1,6 +1,15 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
+
+function getGitCommit(): string | undefined {
+  try {
+    return execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
+  } catch {
+    return undefined;
+  }
+}
 import { evalDatasetSchema } from "./schemas/eval-dataset.schema.js";
 import type { EvalCase } from "./schemas/eval-dataset.schema.js";
 import type { EvalCaseResult, EvalResult } from "./schemas/eval-result.schema.js";
@@ -238,6 +247,7 @@ async function main() {
     runId: `${new Date().toISOString().replace(/[:.]/g, "-")}_${datasetVersion}`,
     datasetVersion,
     timestamp: new Date().toISOString(),
+    gitCommit: getGitCommit(),
     summary: {
       totalCases: caseResults.length,
       passedCases: caseResults.filter((c) => c.passed).length,

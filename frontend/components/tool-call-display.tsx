@@ -98,6 +98,7 @@ function IngestResult({ data }: { data: any }) {
         <span>{data.chunkCount === 0 ? "Full text (below RAG threshold)" : `${data.chunkCount} segments`}</span>
       </div>
       <div className="text-[var(--muted-foreground)]">{data.message}</div>
+      <StagesList stages={data.stages} />
     </div>
   );
 }
@@ -112,6 +113,7 @@ function ComplianceResult({ data }: { data: any }) {
         <ListSection title="Mandatory Requirements" items={data.mandatoryRequirements} max={5} />
         <ListSection title="Qualifications" items={data.qualifications} />
       </div>
+      <StagesList stages={data.stages} />
     </div>
   );
 }
@@ -142,6 +144,7 @@ function RiskResult({ data }: { data: any }) {
       <p className="text-[var(--foreground)]">{data.summary}</p>
       <ListSection title="Penalty Clauses" items={data.penaltyClauses} max={4} />
       <ListSection title="Delivery Risks" items={data.deliveryRisks} max={4} />
+      <StagesList stages={data.stages} />
     </div>
   );
 }
@@ -462,6 +465,25 @@ function Badge({ label, value }: { label: string; value?: string }) {
       <span className={`rounded px-1.5 py-0.5 font-medium ${colors[value.toLowerCase()] ?? "bg-[var(--muted)]"}`}>
         {value}
       </span>
+    </div>
+  );
+}
+
+function StagesList({ stages }: { stages?: string[] }) {
+  if (!stages?.length) return null;
+  return (
+    <div className="mt-2 pt-2 border-t border-[var(--border)]">
+      <div className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] mb-1">
+        Execution Steps
+      </div>
+      <ol className="space-y-0.5">
+        {stages.map((stage, i) => (
+          <li key={i} className="flex items-center gap-1.5 text-xs text-[var(--muted-foreground)]">
+            <span className="text-green-500 shrink-0">{"\u2713"}</span>
+            <span>{stage}</span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

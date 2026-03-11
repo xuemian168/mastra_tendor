@@ -1,6 +1,23 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { evalResultSchema } from "./schemas/eval-result.schema.js";
 import type { EvalResult } from "./schemas/eval-result.schema.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function resolveResultPath(arg: string): string {
+  if (arg === "latest" || arg === "previous") {
+    const resultsDir = resolve(__dirname, "results");
+    const files = readdirSync(resultsDir)
+      .filter((f) => f.endsWith(".json"))
+      .sort()
+      .reverse();
+    if (arg === "latest") return resolve(resultsDir, files[0]);
+    if (arg === "previous") return resolve(resultsDir, files[1]);
+  }
+  return arg;
+}
 
 function loadResult(path: string): EvalResult {
   const raw = JSON.parse(readFileSync(path, "utf-8"));
@@ -79,10 +96,11 @@ function printComparison(r1: EvalResult, r2: EvalResult): void {
 // CLI entry point
 const args = process.argv.slice(2);
 if (args.length < 2) {
-  console.error("Usage: npx tsx src/eval/comparator.ts <result1.json> <result2.json>");
+  console.error("Usage: npx tsx src/eval/comparator.ts <result1> <result2>");
+  console.error("  Supports: file paths, 'latest', 'previous'");
   process.exit(1);
 }
 
-const r1 = loadResult(args[0]);
-const r2 = loadResult(args[1]);
+const r1 = loadResult(resolveResultPath(args[0]));
+const r2 = loadResult(resolveResultPath(args[1]));
 printComparison(r1, r2);

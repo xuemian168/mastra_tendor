@@ -1,0 +1,678 @@
+{
+  "runId": "2026-03-11T03-21-57-036Z_v1",
+  "datasetVersion": "v1",
+  "timestamp": "2026-03-11T03:21:57.036Z",
+  "gitCommit": "9d77777",
+  "summary": {
+    "totalCases": 10,
+    "passedCases": 10,
+    "averageScores": {
+      "decisionMatch": 1,
+      "confidenceInRange": 0.8,
+      "strengthCoverage": 0.8,
+      "weaknessCoverage": 0.9,
+      "riskLevelMatch": 0.9,
+      "deadlineCount": 1,
+      "mandatoryRequirementsCoverage": 1,
+      "topicCoverage": 0.9199999999999999,
+      "findingsCount": 1,
+      "keyPointsCount": 1
+    },
+    "totalTokens": 56932,
+    "totalDurationMs": 214611
+  },
+  "cases": [
+    {
+      "caseId": "tender-001",
+      "category": "tender-bid-nobid",
+      "passed": true,
+      "durationMs": 42028,
+      "tokenUsage": {
+        "prompt": 3926,
+        "completion": 8610
+      },
+      "scores": {
+        "decisionMatch": 1,
+        "confidenceInRange": 1,
+        "strengthCoverage": 1,
+        "weaknessCoverage": 1,
+        "riskLevelMatch": 1,
+        "deadlineCount": 1,
+        "mandatoryRequirementsCoverage": 1
+      },
+      "rawOutput": {
+        "decision": "no_bid",
+        "confidenceScore": 0.95,
+        "rationale": "The decision is a firm 'No-Bid' due to non-compliance with two critical mandatory requirements: the minimum project value threshold (our largest is $18M vs. the required $20M+) and the lack of three reference projects in the border management domain. Beyond these disqualifying factors, the project's 'critical' risk level, 'unfeasible' timeline, and immense scale ($45-65M) are a severe mismatch for our company's current capacity, experience, and financial standing. The substantial liquidated damages for delays and SLA breaches represent an existential threat.",
+        "strengths": [
+          "Possession of mandatory certifications: ISO 27001:2022, ISO 9001:2015, and IRAP PROTECTED.",
+          "Strong technical alignment with the required stack, including AWS GovCloud, Kubernetes, and Terraform.",
+          "Status as a sovereign Australian company, which aids in meeting the 40% local industry capability requirement.",
+          "Existing pool of 12 NV1 cleared personnel, providing a foundational team."
+        ],
+        "weaknesses": [
+          "Failure to meet mandatory requirement for 5+ years delivering AUD $20M+ ICT projects.",
+          "Failure to meet mandatory requirement for 3+ reference projects in border management, customs, or trade facilitation.",
+          "Project scale ($45-65M) is more than double our largest contract to date, indicating a significant gap in experience managing projects of this magnitude.",
+          "Insufficient number of NV1 cleared personnel to staff a project of this size and security classification.",
+          "High resource utilization (~60% of delivery capacity is already committed), leaving insufficient resources for this large-scale engagement.",
+          "The 'unfeasible' timeline and 'critical' risk profile, as identified in the risk analysis, are beyond our capacity to mitigate effectively."
+        ],
+        "keyConditions": [
+          "This is a firm 'No-Bid'. A change in recommendation would require the client to explicitly waive the mandatory requirements for project value and domain-specific experience, which is highly improbable.",
+          "An alternative path would be to participate as a subcontractor to a qualified prime contractor, which would mitigate the primary risks and compliance failures."
+        ],
+        "recommendedActions": [
+          "Formally submit a 'Decline to Bid' notification to the Department of Home Affairs, citing non-compliance with specific mandatory requirements.",
+          "Proactively identify potential prime contractors who are likely to bid and approach them to offer our services as a specialized subcontractor in our areas of strength (e.g., secure AWS GovCloud architecture, IRAP compliance).",
+          "Develop a strategic business development plan to secure a project exceeding AUD $20M to meet this common threshold in future government tenders.",
+          "Investigate strategic partnerships or targeted acquisitions to gain experience in adjacent domains like logistics or law enforcement to broaden our qualification scope."
+        ],
+        "executiveSummary": "A 'No-Bid' decision is strongly recommended. Nexus Digital Solutions is non-compliant with two mandatory requirements: the minimum AUD $20M project value and the required three reference projects in the border management domain. These failures make a compliant bid impossible. Furthermore, the project's critical risk level, unfeasible timeline, and immense scale far exceed our current capabilities and risk tolerance, with potential financial penalties posing an existential threat. The recommended action is to decline the prime bid and immediately pursue a subcontractor role with a larger, qualified prime contractor.",
+        "overallRiskLevel": "critical",
+        "deadlines": [
+          "Date of Issue: 1 March 2026",
+          "RFT Closing Date and Time: 5:00 PM AEST, 15 April 2026",
+          "Contract Award: 1 August 2026",
+          "Design Phase: August-December 2026",
+          "Development Phase 1: January-December 2027",
+          "Development Phase 2: January-June 2028",
+          "User Acceptance Testing (UAT): July-December 2028",
+          "Go-Live: 1 January 2029"
+        ],
+        "mandatoryRequirements": [
+          "Compliance with Commonwealth Procurement Rules (CPRs) 2024",
+          "IRAP assessment at PROTECTED level",
+          "5+ years delivering AUD $20M+ ICT projects for Australian Government",
+          "ISO 27001:2022 certification",
+          "ISO 9001:2015 certification",
+          "3+ reference projects in border management, customs, or trade facilitation",
+          "Modern Slavery Act 2018 compliance",
+          "Local Industry Capability Plan with 40% Australian content",
+          "DTA Digital Marketplace membership",
+          "Professional Indemnity Insurance: AUD $20M",
+          "Public Liability Insurance: AUD $20M",
+          "Cyber Insurance: AUD $10M"
+        ]
+      }
+    },
+    {
+      "caseId": "tender-002",
+      "category": "tender-bid-nobid",
+      "passed": true,
+      "durationMs": 27451,
+      "tokenUsage": {
+        "prompt": 1831,
+        "completion": 4571
+      },
+      "scores": {
+        "decisionMatch": 1,
+        "confidenceInRange": 0,
+        "strengthCoverage": 1,
+        "weaknessCoverage": 0.5,
+        "riskLevelMatch": 1,
+        "deadlineCount": 1,
+        "mandatoryRequirementsCoverage": 1
+      },
+      "rawOutput": {
+        "decision": "no_bid",
+        "confidenceScore": 95,
+        "rationale": "The decision is 'No-Bid' due to two critical, insurmountable factors. Firstly, the company fails to meet the mandatory requirement for 'Minimum 2 reference sites processing similar data volumes,' as we have no prior projects of this scale. This is a non-negotiable compliance failure. Secondly, the risk analysis identifies the 6-month delivery timeline as 'unfeasible,' exposing the company to severe financial penalties (AUD 10,000/day) and significant reputational damage. The project's complexity and scale are a poor fit for our current capacity and experience.",
+        "strengths": [
+          "Holds mandatory ISO 27001 certification.",
+          "Possesses the required IRAP assessment at PROTECTED level.",
+          "Exceeds the minimum 3 years of experience with Australian Government clients (5 years total).",
+          "Demonstrated expertise in the required Kubernetes and cloud-native technologies."
+        ],
+        "weaknesses": [
+          "Inability to meet the mandatory requirement for two reference sites with comparable data volumes, making the bid non-compliant.",
+          "The 6-month delivery timeline is extremely aggressive and assessed as unfeasible for a platform of this complexity.",
+          "Small company size (50 employees) is insufficient to resource this large-scale project, especially within the compressed timeframe.",
+          "High risk of incurring significant financial penalties due to likely delays and potential SLA breaches on a new, complex system."
+        ],
+        "keyConditions": [
+          "Not applicable for a 'no_bid' decision. No realistic conditions could mitigate the fundamental compliance failure and unfeasible timeline."
+        ],
+        "recommendedActions": [
+          "Formally decline to bid on tender GOV-2026-IT-0512, citing the inability to meet specific mandatory requirements.",
+          "Identify and pursue a strategic partnership with a larger systems integrator who possesses the required reference sites, positioning our company as a specialized subcontractor for future opportunities.",
+          "Proactively engage with the Department of Finance to showcase our specific expertise in secure, cloud-native deployments and express interest in future, more appropriately scoped projects.",
+          "Focus business development efforts on securing projects that will serve as stepping stones to build the necessary large-scale data platform experience and references."
+        ],
+        "executiveSummary": "A 'No-Bid' decision is recommended for the Enterprise Data Analytics Platform tender (GOV-2026-IT-0512). Despite aligning well on security (ISO 27001, IRAP PROTECTED) and government experience, we fail a mandatory requirement for two large-scale reference sites, rendering a bid non-compliant. Furthermore, the 6-month delivery timeline is assessed as unfeasible, presenting an unacceptable level of risk for financial penalties and reputational harm. The project's scale and complexity far exceed our current proven capabilities.",
+        "overallRiskLevel": "high",
+        "deadlines": [
+          "Tender Close: 30 April 2026",
+          "Evaluation: May 2026",
+          "Contract Award: 1 July 2026",
+          "Platform Delivery: 31 December 2026"
+        ],
+        "mandatoryRequirements": [
+          "ISO 27001 certification",
+          "Minimum 3 years experience delivering analytics platforms for Australian Government",
+          "IRAP assessment at PROTECTED level",
+          "Demonstrated Kubernetes and cloud-native deployment expertise",
+          "Minimum 2 reference sites processing similar data volumes"
+        ]
+      }
+    },
+    {
+      "caseId": "analysis-001",
+      "category": "general-analysis",
+      "passed": true,
+      "durationMs": 7696,
+      "tokenUsage": {
+        "prompt": 792,
+        "completion": 1552
+      },
+      "scores": {
+        "topicCoverage": 1,
+        "findingsCount": 1
+      },
+      "rawOutput": {
+        "analysisType": "Comprehensive Software License Agreement Analysis",
+        "keyFindings": [
+          {
+            "category": "Fees and Payment",
+            "finding": "The annual license fee escalates by 10% each year (AUD 850,000 in Year 1 to AUD 1,028,500 in Year 3). A one-time implementation fee of AUD 200,000 is also required. Late payments incur a significant 1.5% compounded monthly interest.",
+            "importance": "critical"
+          },
+          {
+            "category": "Fees and Payment",
+            "finding": "An early termination fee of 50% of the remaining contract value is stipulated, which could be substantial given the high annual fees.",
+            "importance": "high"
+          },
+          {
+            "category": "Liability and Indemnification",
+            "finding": "Licensor's liability is capped at 12 months of fees paid, and consequential, indirect, and punitive damages are explicitly excluded. This limits the Licensee's recourse in case of significant issues.",
+            "importance": "high"
+          },
+          {
+            "category": "Liability and Indemnification",
+            "finding": "Licensor indemnifies Licensee against third-party IP infringement claims, which is a positive protection for the Licensee.",
+            "importance": "medium"
+          },
+          {
+            "category": "Termination",
+            "finding": "The initial term is 3 years with auto-renewal for 1-year periods, requiring 90 days' written notice to prevent renewal. A 30-day cure period is provided for material breaches.",
+            "importance": "medium"
+          },
+          {
+            "category": "Termination",
+            "finding": "Licensor can suspend access for non-payment exceeding 45 days, which could severely disrupt Licensee's operations.",
+            "importance": "high"
+          },
+          {
+            "category": "Data Protection",
+            "finding": "Licensor commits to compliance with the Privacy Act 1988 (Cth) and Australian Privacy Principles, with data stored exclusively in Australian data centres. Data breach notification is within 24 hours.",
+            "importance": "high"
+          },
+          {
+            "category": "Data Protection",
+            "finding": "Upon termination, Licensor must return or destroy all Licensee data within 30 days, with transition assistance available for up to 90 days at standard rates.",
+            "importance": "medium"
+          },
+          {
+            "category": "Service Levels",
+            "finding": "A 99.9% monthly availability target is set, with service credits of 5% of the monthly fee per 0.1% below target, capped at 25%. Support response times are defined for critical (1 hr), high (4 hrs), and medium (8 hrs) priority issues.",
+            "importance": "high"
+          },
+          {
+            "category": "Intellectual Property",
+            "finding": "Customisations developed for Licensee are jointly owned, and Licensee receives a perpetual license to use these customisations even after termination, which is beneficial.",
+            "importance": "medium"
+          },
+          {
+            "category": "Insurance",
+            "finding": "Licensor is required to maintain substantial insurance coverage: Professional Indemnity AUD 10M, Public Liability AUD 10M, and Cyber Liability AUD 5M.",
+            "importance": "medium"
+          }
+        ],
+        "summary": "This Software License Agreement grants DataFlow Solutions Ltd a non-exclusive, non-transferable license to use TechCorp's CloudAnalytics Platform for 3 years, with annual fees escalating by 10% and a significant early termination fee. Key provisions include a 99.9% availability SLA with service credits, robust data protection clauses adhering to Australian privacy laws, and a 24-hour data breach notification. Licensor's liability is capped at 12 months of fees, excluding consequential damages, but includes IP infringement indemnification. Customisations are jointly owned with perpetual usage rights for the Licensee. The agreement is governed by NSW law, with disputes resolved via mediation then arbitration.",
+        "recommendations": [
+          "Negotiate the 10% annual fee escalation, especially for years 2 and 3, to ensure cost predictability and alignment with value received. Consider a lower, fixed escalation or performance-based increases.",
+          "Review the early termination fee (50% of remaining contract value) and attempt to reduce it or tie it to specific performance failures by the Licensor, as it represents a significant financial risk.",
+          "Assess the liability cap (12 months of fees paid) and the exclusion of consequential damages. Depending on the potential impact of software failure, consider negotiating a higher cap or specific carve-outs for gross negligence or willful misconduct.",
+          "Ensure that the service credit cap of 25% of the monthly fee is sufficient to compensate for potential business disruption caused by prolonged unavailability. Evaluate if a higher cap or additional remedies are necessary.",
+          "Clarify the scope and cost of 'transition assistance at standard rates' upon termination to avoid unexpected expenses during data migration or system changeover.",
+          "Establish clear procedures and responsibilities for the joint ownership of customisations, including maintenance, support, and future development rights, to prevent potential disputes.",
+          "Verify that the Licensor's insurance policies (Professional Indemnity, Public Liability, Cyber Liability) are current and provide adequate coverage for the Licensee's potential risks."
+        ]
+      }
+    },
+    {
+      "caseId": "summary-001",
+      "category": "document-summary",
+      "passed": true,
+      "durationMs": 8024,
+      "tokenUsage": {
+        "prompt": 591,
+        "completion": 1520
+      },
+      "scores": {
+        "keyPointsCount": 1,
+        "topicCoverage": 1
+      },
+      "rawOutput": {
+        "title": "TechCorp CloudAnalytics Platform - Software License Agreement",
+        "overview": "This Software License Agreement, effective March 1, 2026, outlines the terms under which TechCorp Pty Ltd (Licensor) grants DataFlow Solutions Ltd (Licensee) a non-exclusive, non-transferable license to use the CloudAnalytics Platform. The agreement details the scope of use, financial obligations, service level commitments, data protection measures, intellectual property rights, liability limitations, termination conditions, governing law, and insurance requirements for a 3-year initial term.",
+        "keyPoints": [
+          "A non-exclusive, non-transferable license is granted for the CloudAnalytics Platform for internal business use, limited to 500 named users across APAC, EMEA, and Americas regions.",
+          "The initial term is 3 years, with automatic 1-year renewals unless 90 days' written notice is given. Early termination incurs a 50% fee of the remaining contract value.",
+          "Annual license fees start at AUD 850,000 in Year 1, escalating by 10% annually, plus an AUD 200,000 implementation fee. Payments are due Net 30, with late interest at 1.5% per month.",
+          "Service levels guarantee 99.9% availability, with P1 response within 1 hour and P2 within 4 hours. Service credits are offered for non-compliance, capped at 25%.",
+          "Data protection adheres to the Privacy Act 1988, requiring Australian data centres, 24-hour breach notification, and data return/destruction within 30 days post-termination.",
+          "Software IP remains with the Licensor, while customisations are jointly owned, with the Licensee receiving a perpetual license for customisations post-termination.",
+          "Liability is capped at 12 months' fees, excluding consequential damages, with IP indemnification provided by the Licensor. Force majeure is limited to 60 days.",
+          "Termination can occur due to material breach (30-day cure period) or non-payment (suspension after 45 days). 90 days of transition assistance are provided upon termination.",
+          "The agreement is governed by the laws of New South Wales, Australia, with dispute resolution via mediation then ACICA arbitration.",
+          "Licensee must maintain Professional Indemnity (AUD 10M), Public Liability (AUD 10M), and Cyber (AUD 5M) insurance."
+        ],
+        "sections": [
+          {
+            "heading": "1. GRANT OF LICENSE",
+            "content": "Licensor grants Licensee a non-exclusive, non-transferable license to use the CloudAnalytics Platform for internal business purposes, limited to 500 named users across 3 geographic regions: APAC, EMEA, and Americas."
+          },
+          {
+            "heading": "2. TERM AND RENEWAL",
+            "content": "The initial term of the agreement is 3 years. It will auto-renew for subsequent 1-year periods unless either party provides 90 days' written notice of non-renewal. An early termination fee of 50% of the remaining contract value applies if the agreement is terminated prematurely."
+          },
+          {
+            "heading": "3. FEES AND PAYMENT",
+            "content": "The annual license fee is AUD 850,000 for Year 1, AUD 935,000 for Year 2, and AUD 1,028,500 for Year 3, with a 10% annual escalation. An additional implementation fee of AUD 200,000 is also applicable. Payments are due within 30 days (Net 30), and late payments will incur interest at 1.5% per month."
+          },
+          {
+            "heading": "4. SERVICE LEVELS",
+            "content": "The Licensor commits to a 99.9% availability service level. Priority 1 (P1) issues will receive a response within 1 hour, and Priority 2 (P2) issues within 4 hours. Service credits of 5% per 0.1% below the target availability are offered, capped at 25% of the monthly fees."
+          },
+          {
+            "heading": "5. DATA PROTECTION",
+            "content": "The agreement mandates compliance with the Privacy Act 1988. All data must be hosted in Australian data centres only. In the event of a data breach, notification must occur within 24 hours. Upon termination, data must be returned or destroyed within 30 days."
+          },
+          {
+            "heading": "6. INTELLECTUAL PROPERTY",
+            "content": "All Intellectual Property (IP) rights for the software remain with the Licensor. Any customisations developed under this agreement will be jointly owned. Post-termination, the Licensee will receive a perpetual license for these customisations."
+          },
+          {
+            "heading": "7. LIABILITY",
+            "content": "Liability is capped at the equivalent of 12 months' fees. The agreement excludes liability for consequential damages. The Licensor provides indemnification for intellectual property infringements. Force majeure events are acknowledged, with a maximum duration of 60 days."
+          },
+          {
+            "heading": "8. TERMINATION",
+            "content": "The agreement can be terminated in case of a material breach, provided there is a 30-day cure period. Non-payment may lead to suspension after 45 days. Upon termination, the Licensor will provide 90 days of transition assistance to the Licensee."
+          },
+          {
+            "heading": "9. GOVERNING LAW",
+            "content": "The agreement is governed by the laws of New South Wales, Australia. Disputes will first undergo mediation, followed by arbitration under the rules of the Australian Centre for International Commercial Arbitration (ACICA)."
+          },
+          {
+            "heading": "10. INSURANCE",
+            "content": "The Licensee is required to maintain specific insurance policies: Professional Indemnity (PI) with coverage of AUD 10 million, Public Liability (PL) with coverage of AUD 10 million, and Cyber insurance with coverage of AUD 5 million."
+          }
+        ]
+      }
+    },
+    {
+      "caseId": "tender-003",
+      "category": "tender-bid-nobid",
+      "passed": true,
+      "durationMs": 31784,
+      "tokenUsage": {
+        "prompt": 2744,
+        "completion": 6837
+      },
+      "scores": {
+        "decisionMatch": 1,
+        "confidenceInRange": 1,
+        "strengthCoverage": 0,
+        "weaknessCoverage": 1,
+        "riskLevelMatch": 1,
+        "deadlineCount": 1,
+        "mandatoryRequirementsCoverage": 1
+      },
+      "rawOutput": {
+        "decision": "no_bid",
+        "confidenceScore": 10,
+        "rationale": "The decision is a definitive 'No-Bid' due to a complete and insurmountable misalignment between CloudMinds Pty Ltd's capabilities and the RFP's mandatory requirements. The company, a 30-person startup with a largest project value of AUD $2M in the retail sector, fails to meet every single mandatory qualification, including 10 years of experience on projects over $50M, numerous critical certifications (ISO 13485, NSQHS, IRAP PROTECTED), and existing contracts with state health departments. The project's 'critical' risk level, unfeasible timeline, and severe financial penalties would be catastrophic for an organization of CloudMinds' size and experience.",
+        "strengths": [
+          "No identifiable strengths relevant to this specific opportunity."
+        ],
+        "weaknesses": [
+          "Complete failure to meet all mandatory bidder qualifications, including ISO 13485, NSQHS accreditation, and IRAP assessment.",
+          "Zero experience in the healthcare IT sector, with government contracts, or with relevant standards like HL7 FHIR and TGA SaMD.",
+          "Company scale (30 employees) and financial capacity are grossly insufficient for a $120M+ national infrastructure project.",
+          "Largest completed project ($2M) is two orders of magnitude smaller than the required experience ($50M+).",
+          "Inability to bear the financial risk from severe penalty clauses for delays, data breaches, and SLA failures."
+        ],
+        "keyConditions": [
+          "No realistic conditions exist under which CloudMinds could qualify or successfully bid as the prime contractor for this opportunity."
+        ],
+        "recommendedActions": [
+          "Immediately cease all work related to this RFP and formally communicate the 'No-Bid' decision internally.",
+          "Do not allocate any company resources to preparing a response.",
+          "Use this RFP as an internal case study to understand the high barrier to entry for the national health IT market.",
+          "Focus business development efforts exclusively on opportunities within the company's core competencies of retail and hospitality applications."
+        ],
+        "executiveSummary": "A 'No-Bid' decision is unequivocally recommended with maximum confidence. CloudMinds Pty Ltd, a small startup focused on retail applications, is fundamentally unqualified for this national-scale, high-risk healthcare integration project. The company meets none of the mandatory technical, financial, or experiential requirements. Pursuing this RFP would be a futile and costly distraction with zero probability of success and would expose the company to existential risks. All resources should be directed away from this opportunity.",
+        "overallRiskLevel": "critical",
+        "deadlines": [
+          "RFP Close: 1 May 2026",
+          "Shortlist: 1 July 2026",
+          "Contract Award: 1 October 2026",
+          "Phase 1 (Design): Oct 2026 - Mar 2027",
+          "Phase 2 (Build): Apr 2027 - Dec 2028",
+          "Phase 3 (Rollout): Jan 2029 - Jun 2030"
+        ],
+        "mandatoryRequirements": [
+          "ISO 13485:2016 Medical Device QMS certification",
+          "NSQHS Standards accreditation",
+          "Minimum 10 years delivering health IT systems exceeding AUD $50M",
+          "HL7 International membership and FHIR implementation certification",
+          "Existing contracts with minimum 3 Australian state/territory health departments",
+          "IRAP assessment at PROTECTED level",
+          "TGA software as medical device (SaMD) registration experience",
+          "Australian Digital Health Agency partnership or approved vendor status"
+        ]
+      }
+    },
+    {
+      "caseId": "tender-004",
+      "category": "tender-bid-nobid",
+      "passed": true,
+      "durationMs": 29962,
+      "tokenUsage": {
+        "prompt": 1611,
+        "completion": 4234
+      },
+      "scores": {
+        "decisionMatch": 1,
+        "confidenceInRange": 1,
+        "strengthCoverage": 1,
+        "weaknessCoverage": 1,
+        "riskLevelMatch": 1,
+        "deadlineCount": 1
+      },
+      "rawOutput": {
+        "decision": "conditional_bid",
+        "confidenceScore": 4.5,
+        "rationale": "The project aligns perfectly with our core competencies, including extensive experience with government clients, WCAG 2.1 AA compliance, and WordPress development. However, the risk analysis identifies the project timeline as 'unfeasible' and 'extremely aggressive', which presents a high probability of delivery failure, budget overruns, and reputational damage. Therefore, a standard bid is too risky. A bid should only be submitted on the condition that the primary risks, particularly the schedule, can be formally addressed and mitigated through negotiation with the client.",
+        "strengths": [
+          "Exceptional alignment of company expertise with all mandatory requirements (government portfolio, WCAG 2.1 AA, ABN).",
+          "Proven track record with 12 previous government agency projects, demonstrating reliability and understanding of the sector.",
+          "In-house specialization in the required technologies (WordPress) and compliance standards (WCAG 2.1 AA)."
+        ],
+        "weaknesses": [
+          "The project timeline is unfeasible, compressing design, development, and migration for a 200-page site into approximately three months.",
+          "The budget of AUD $80,000-120,000 may be insufficient to resource the project adequately for the accelerated timeline required.",
+          "High risk of incurring penalties for late delivery or non-compliance due to the tight schedule.",
+          "The project's success is highly dependent on rapid client feedback and content delivery, which introduces significant external risk."
+        ],
+        "keyConditions": [
+          "The bid is contingent upon the negotiation and formal extension of the project deadlines to a realistic timeframe.",
+          "A clear Service Level Agreement (SLA) for client feedback and content provision must be established and contractually agreed upon.",
+          "The scope must be rigidly defined, with a formal change control process to manage any requests that could impact the timeline or budget.",
+          "Agreement on a phased delivery approach to mitigate risk, potentially launching with core functionality and migrating content post-launch."
+        ],
+        "recommendedActions": [
+          "Submit pre-bid clarification questions to the agency, formally highlighting the timeline risks and inquiring about flexibility.",
+          "Develop a proposal that includes two project plans: one mapping to the client's timeline (clearly stating the associated risks) and a second, recommended plan with a feasible schedule.",
+          "Prepare a detailed risk register as part of the bid submission, outlining each risk and our proposed mitigation strategy.",
+          "Structure the pricing proposal to reflect the high-risk nature of the current timeline, with a separate, potentially lower-cost option for the recommended, extended timeline."
+        ],
+        "executiveSummary": "We recommend a 'Conditional Bid' for the ASBFEO website redesign. While our agency is an ideal candidate with extensive, directly relevant experience, the project's unfeasible timeline presents an unacceptable level of risk. Our bid must be contingent upon negotiating a more realistic project schedule and establishing clear client responsibilities. Proceeding without these conditions would expose the agency to significant financial and reputational harm.",
+        "overallRiskLevel": "high",
+        "deadlines": [
+          "Closing: 20 April 2026",
+          "Design mockups by 15 May 2026",
+          "Development complete by 30 June 2026",
+          "Go-live by 31 July 2026"
+        ],
+        "mandatoryRequirements": [
+          "ABN required",
+          "Portfolio of 3+ government website projects",
+          "WCAG 2.1 AA experience"
+        ]
+      }
+    },
+    {
+      "caseId": "tender-005",
+      "category": "tender-bid-nobid",
+      "passed": true,
+      "durationMs": 28876,
+      "tokenUsage": {
+        "prompt": 1055,
+        "completion": 4600
+      },
+      "scores": {
+        "decisionMatch": 1,
+        "confidenceInRange": 1,
+        "strengthCoverage": 1,
+        "weaknessCoverage": 1,
+        "riskLevelMatch": 0.5
+      },
+      "rawOutput": {
+        "decision": "conditional_bid",
+        "confidenceScore": 7.5,
+        "rationale": "The opportunity is an Expression of Interest (EOI) requiring only a capability statement, which represents a low initial investment. This allows us to engage with a strategic government client in our areas of expertise. However, the project's risk profile is 'critical' due to an undefined scope, no allocated budget, and a flexible timeline. Therefore, a full commitment is unwarranted. A conditional bid allows us to enter the process while making further participation strictly contingent on the client providing the necessary clarity on scope, budget, and timeline.",
+        "strengths": [
+          "Strong alignment of company expertise (process automation, cloud migration) with the client's stated areas of interest.",
+          "Existing government experience and ISO 27001 certification provide credibility and reduce compliance risks.",
+          "The low-effort EOI stage (capability statement) minimizes the cost of entry and risk of wasted resources."
+        ],
+        "weaknesses": [
+          "The project's 'critical' risk level, stemming from the lack of defined scope, budget, and timeline, creates extreme uncertainty.",
+          "As a mid-tier firm, we may face competition from larger vendors with broader capabilities across all four interest areas.",
+          "The undefined nature of the project makes it impossible to accurately forecast resource needs or potential profitability."
+        ],
+        "keyConditions": [
+          "Our participation is limited to the submission of the initial EOI capability statement.",
+          "Further engagement beyond the EOI stage is strictly conditional upon the client providing a defined scope of work.",
+          "Progression to a formal proposal stage requires the client to confirm an allocated budget range and a structured project timeline."
+        ],
+        "recommendedActions": [
+          "Assign a senior consultant to draft a high-level capability statement, time-boxing the effort to minimize cost.",
+          "Focus the capability statement on our core strengths in process automation and cloud migration, citing relevant government project experience.",
+          "Prepare a list of clarifying questions regarding scope, budget, and success metrics to be presented if shortlisted.",
+          "Do not allocate any technical or delivery resources to this opportunity until the key conditions are met."
+        ],
+        "executiveSummary": "We recommend a 'Conditional Bid' on the Department of Industry's EOI. The request aligns well with our core capabilities and government experience, and the initial submission requires minimal investment. However, the project carries critical risks due to the absence of a defined scope, budget, or timeline. Our strategy is to submit a compelling capability statement to get shortlisted, but make any further resource commitment strictly conditional on the client providing concrete project parameters.",
+        "overallRiskLevel": "critical",
+        "deadlines": [
+          "submit a capability statement by 30 April 2026"
+        ],
+        "mandatoryRequirements": []
+      }
+    },
+    {
+      "caseId": "analysis-002",
+      "category": "general-analysis",
+      "passed": true,
+      "durationMs": 15472,
+      "tokenUsage": {
+        "prompt": 620,
+        "completion": 3003
+      },
+      "scores": {
+        "topicCoverage": 0.8,
+        "findingsCount": 1
+      },
+      "rawOutput": {
+        "analysisType": "Technical Capabilities, Compliance, and Integration Analysis",
+        "keyFindings": [
+          {
+            "category": "Technical Capabilities - Hardware",
+            "finding": "The SmartGrid Controller v3.0 features robust, industrial-grade hardware with an ARM Cortex-A72 quad-core processor, 4GB RAM, 64GB storage, and extensive connectivity options including 2x Gigabit Ethernet, WiFi 6, BLE 5.2, LoRaWAN, and 4G LTE. Its IP67 rated enclosure and -40C to +85C operating temperature make it suitable for harsh industrial environments, with PoE+ support for flexible power.",
+            "importance": "critical"
+          },
+          {
+            "category": "Technical Capabilities - Software & Performance",
+            "finding": "The device runs on a custom Yocto-based Linux OS with a container-based runtime (Podman), supporting edge ML with TensorFlow Lite and ONNX Runtime. It integrates multiple industrial protocols (MQTT 5.0, OPC-UA, Modbus TCP/RTU, BACnet) and meets high performance requirements, including polling 10,000 endpoints at 1Hz, <50ms edge inference, and 99.99% uptime.",
+            "importance": "critical"
+          },
+          {
+            "category": "Technical Capabilities - Security",
+            "finding": "Comprehensive security features are embedded, including TPM 2.0, secure boot, encrypted storage, certificate-based authentication, and robust OTA updates via an A/B partition scheme with rollback capabilities, crucial for industrial IoT deployments.",
+            "importance": "critical"
+          },
+          {
+            "category": "Compliance - Industrial Standards",
+            "finding": "The controller adheres to critical industrial standards such as IEC 62443 (Industrial Cybersecurity), IEC 61131-3 (PLC Programming), and UL 508 Listed (Industrial Control Equipment Safety), which are essential for deployment in regulated industrial sectors.",
+            "importance": "critical"
+          },
+          {
+            "category": "Compliance - Environmental & Regional",
+            "finding": "It holds standard regional certifications (CE, FCC, RCM) and complies with environmental directives (RoHS, WEEE), ensuring broad market acceptance and environmental responsibility.",
+            "importance": "high"
+          },
+          {
+            "category": "Integration Challenges - Protocol Diversity & Legacy Systems",
+            "finding": "While supporting a wide array of industrial protocols (OPC-UA, Modbus, BACnet), integrating with highly diverse or legacy industrial control systems may require significant configuration, data mapping, and potentially custom development to ensure seamless interoperability.",
+            "importance": "high"
+          },
+          {
+            "category": "Integration Challenges - Custom Software Stack",
+            "finding": "The custom Yocto-based Linux OS and Podman container runtime, while offering flexibility and security, might necessitate specialized expertise for custom application development, deployment, debugging, and toolchain integration compared to more common operating environments.",
+            "importance": "medium"
+          },
+          {
+            "category": "Integration Challenges - Cloud & Data Management",
+            "finding": "Integrating the aggregated 1M datapoints/minute with specific cloud backends via MQTT and REST APIs will require careful planning for data formats, authentication, and robust cloud infrastructure to handle the high volume and ensure efficient processing and storage.",
+            "importance": "high"
+          },
+          {
+            "category": "Integration Challenges - Security Operations",
+            "finding": "Managing the lifecycle of certificate-based authentication and secure boot processes across a large deployment of up to 10,000 devices can present significant operational challenges for security and IT teams.",
+            "importance": "high"
+          }
+        ],
+        "summary": "The SmartGrid Controller v3.0 is a highly capable and robust IoT gateway designed for demanding industrial environments. It boasts powerful, industrial-grade hardware, a sophisticated container-based software architecture with advanced edge analytics, and comprehensive security features including TPM 2.0 and secure boot. The device demonstrates strong compliance with critical industrial cybersecurity (IEC 62443), safety (UL 508), and environmental standards. Key integration challenges include managing its diverse industrial protocol support with legacy systems, adapting to its custom Yocto/Podman software stack, ensuring scalable cloud integration for high data volumes, and operationalizing its advanced security features across large deployments.",
+        "recommendations": [
+          "Develop comprehensive integration guides and SDKs for common cloud platforms to streamline backend connectivity and data ingestion, particularly for the high volume of aggregated data.",
+          "Provide detailed documentation and training resources for the custom Yocto Linux and Podman environment to facilitate third-party application development, deployment, and troubleshooting.",
+          "Implement a robust certificate lifecycle management system and secure key provisioning strategy to simplify the operational overhead of certificate-based authentication for large-scale deployments.",
+          "Conduct thorough interoperability testing with a wide range of legacy and modern industrial control systems to validate protocol compatibility and identify potential data mapping complexities early in the deployment phase.",
+          "Offer specialized support or consultancy services to assist users in optimizing edge ML models (TensorFlow Lite, ONNX) for efficient execution on the ARM Cortex-A72 processor."
+        ]
+      }
+    },
+    {
+      "caseId": "analysis-003",
+      "category": "general-analysis",
+      "passed": true,
+      "durationMs": 15589,
+      "tokenUsage": {
+        "prompt": 3133,
+        "completion": 3189
+      },
+      "scores": {
+        "topicCoverage": 0.8,
+        "findingsCount": 1
+      },
+      "rawOutput": {
+        "analysisType": "Financial, Investment, and Strategic Performance Analysis",
+        "keyFindings": [
+          {
+            "category": "Financial Performance - Commitments",
+            "finding": "ARENA committed $890 million in new funding across 47 projects, falling short of the $1.1 billion target and 60+ projects target for the 2025-26 financial year.",
+            "importance": "high"
+          },
+          {
+            "category": "Financial Performance - Revenue & Expenditure",
+            "finding": "Total revenue reached $1.2 billion, with a net surplus of $150 million carried forward to the next financial year, indicating sound financial management.",
+            "importance": "high"
+          },
+          {
+            "category": "Financial Performance - Cost Effectiveness",
+            "finding": "ARENA demonstrated strong cost-effectiveness, achieving an average co-investment ratio of 1:3.2 (leveraging $3.20 in private capital for every $1 invested), an administration cost ratio of 8.1% (below the 10% target), and a project completion rate of 94% (above the 90% target).",
+            "importance": "critical"
+          },
+          {
+            "category": "Financial Performance - Audit",
+            "finding": "The ANAO audit found no material issues, with only three minor recommendations, including improving documentation of risk assessment methodology.",
+            "importance": "high"
+          },
+          {
+            "category": "Investment Portfolio - Distribution",
+            "finding": "Energy storage received the largest share of investment at $250 million, followed by solar ($210 million), wind ($180 million), green hydrogen ($150 million), and demand response ($100 million).",
+            "importance": "high"
+          },
+          {
+            "category": "Investment Portfolio - Regional Focus",
+            "finding": "A significant portion of investments, $480 million (54% of total), was directed towards regional and remote projects, supporting regional development in areas like Hunter Valley, Gladstone, Pilbara, and Latrobe Valley.",
+            "importance": "medium"
+          },
+          {
+            "category": "Strategic Priorities - Alignment",
+            "finding": "Investments strongly aligned with the 2025-26 strategic priorities of grid-scale storage ($250M), green hydrogen ($150M), and demand-side flexibility ($100M), evidenced by initiatives like the Grid Resilience Program and the Gladstone Hydrogen Hub.",
+            "importance": "critical"
+          },
+          {
+            "category": "Strategic Priorities - Impact",
+            "finding": "ARENA-funded projects contributed to an estimated 12.8 Mt CO2-e reduction in 2025-26 and supported 8,200 direct FTE jobs, demonstrating significant progress towards its mission and broader economic benefits.",
+            "importance": "high"
+          }
+        ],
+        "summary": "The Australian Renewable Energy Agency (ARENA) delivered a strong financial performance in 2025-26, achieving a net surplus of $150 million and exceeding cost-effectiveness targets with an impressive 1:3.2 co-investment ratio and 94% project completion rate. While new commitments of $890 million across 47 projects fell short of the $1.1 billion target, the investment portfolio was strategically distributed, with energy storage receiving the largest share ($250 million), followed by solar, wind, green hydrogen, and demand response. A significant 54% of investments were directed towards regional and remote projects. The investment strategy demonstrated strong alignment with ARENA's key strategic priorities of grid-scale storage, green hydrogen, and demand-side flexibility, leading to substantial environmental impacts (12.8 Mt CO2-e reduction) and job creation (8,200 direct jobs). The ANAO audit found no material issues, affirming robust governance and financial integrity.",
+        "recommendations": [
+          "Analyze the reasons for the shortfall in new commitments against the $1.1 billion target and 60+ projects, and adjust future targets or refine outreach strategies to meet ambitious goals.",
+          "Continue to prioritize and strategically invest in grid-scale storage, green hydrogen, and demand-side flexibility, given their critical role in the energy transition and the demonstrated impact.",
+          "Implement the minor recommendations from the ANAO audit, particularly regarding the documentation of risk assessment methodology, to further enhance governance and risk management frameworks.",
+          "Leverage the strong co-investment ratio (1:3.2) as a key selling point to attract even greater private capital and expand the scale of renewable energy projects.",
+          "Maintain the strong focus on regional development and job creation, as these initiatives provide significant economic and social benefits beyond emissions reduction."
+        ]
+      }
+    },
+    {
+      "caseId": "summary-002",
+      "category": "document-summary",
+      "passed": true,
+      "durationMs": 7729,
+      "tokenUsage": {
+        "prompt": 896,
+        "completion": 1617
+      },
+      "scores": {
+        "keyPointsCount": 1,
+        "topicCoverage": 1
+      },
+      "rawOutput": {
+        "title": "Federal Courts - Cybersecurity Incident Response Plan v4.0",
+        "overview": "This document outlines the Federal Courts' comprehensive Cybersecurity Incident Response Plan, version 4.0, effective January 2026. It establishes detailed procedures for detecting, responding to, and recovering from cybersecurity incidents affecting all IT systems, networks, and data assets managed by the Courts Administration Service, encompassing the Federal Court, Family Court, and Federal Circuit and Family Court. The plan defines incident classification, response phases, roles, communication protocols, and a schedule for testing and maintenance.",
+        "keyPoints": [
+          "Establishes clear procedures for detecting, responding to, and recovering from cybersecurity incidents across all Federal Courts' IT systems.",
+          "Defines four severity levels (SEV-1 Critical to SEV-4 Low) with specific response times and an escalation matrix involving internal and external stakeholders.",
+          "Outlines a structured four-phase incident response process: Detection and Analysis, Containment, Eradication and Recovery, and Post-Incident activities.",
+          "Details the roles and responsibilities of the internal Incident Response Team (IRT) and lists essential external contacts for incident management.",
+          "Specifies internal and external communication protocols, including public notification requirements and secure channels.",
+          "Mandates regular testing through tabletop exercises and full simulations, along with periodic plan reviews and annual staff training to ensure preparedness."
+        ],
+        "sections": [
+          {
+            "heading": "1. PURPOSE AND SCOPE",
+            "content": "This section defines the plan's objective to establish procedures for cybersecurity incident detection, response, and recovery. It covers all IT systems, networks, and data assets managed by the Courts Administration Service, including those of the Federal Court, Family Court, and Federal Circuit and Family Court."
+          },
+          {
+            "heading": "2. INCIDENT CLASSIFICATION",
+            "content": "This section details four severity levels for cybersecurity incidents: SEV-1 (Critical), SEV-2 (High), SEV-3 (Medium), and SEV-4 (Low), each with defined characteristics, required response times (e.g., immediate for SEV-1, within 1 hour for SEV-2), and an escalation matrix involving various internal roles (CISO, CTO) and external entities (Attorney-General's Department, ASD/ACSC)."
+          },
+          {
+            "heading": "3. RESPONSE PROCEDURES",
+            "content": "This section outlines the four phases of incident response: Detection and Analysis (monitoring SIEM, network traffic, endpoint detection, threat intelligence), Containment (isolating systems, preserving evidence, activating backup communications), Eradication and Recovery (removing malicious artifacts, patching vulnerabilities, restoring from backups), and Post-Incident (formal review, policy updates, reporting to ASD, committee briefings)."
+          },
+          {
+            "heading": "4. ROLES AND RESPONSIBILITIES",
+            "content": "This section identifies the key members of the Incident Response Team (IRT), including the Incident Commander (CISO), Technical Lead, Communications, Legal, and Evidence roles. It also lists critical external contacts such as ASD/ACSC, AFP Cybercrime, OAIC for privacy breaches, and the cyber insurance provider."
+          },
+          {
+            "heading": "5. COMMUNICATION PROTOCOLS",
+            "content": "This section specifies internal communication channels (Secure Teams, Signal group) and external communication protocols. It mandates the use of pre-approved media statements, direct briefings for judicial officers in severe incidents, and public website notices within 24 hours for incidents affecting public services."
+          },
+          {
+            "heading": "6. TESTING AND MAINTENANCE",
+            "content": "This section details the schedule for ensuring the plan's effectiveness and currency. It includes quarterly tabletop exercises, annual full simulation exercises (next in March 2026), a plan review every six months, and annual mandatory cybersecurity awareness training for all staff."
+          }
+        ]
+      }
+    }
+  ]
+}

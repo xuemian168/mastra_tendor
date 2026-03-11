@@ -57,8 +57,19 @@ export const assessRiskTool = createTool({
         tokenTracker.record("risk-tool", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
       }
 
+      const output = result.object as Record<string, unknown>;
       tokenTracker.completeStep("risk-tool");
-      return result.object;
+
+      const stages: string[] = [];
+      if (fullText) {
+        stages.push("Using cached full text");
+      } else {
+        stages.push(`Retrieved relevant chunks from "${inputData.indexName}"`);
+      }
+      stages.push("Evaluating risk factors");
+      stages.push("Generated structured risk report");
+
+      return { ...output, stages };
     } catch (error) {
       tokenTracker.completeStep("risk-tool");
       return {

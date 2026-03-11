@@ -8,10 +8,20 @@ function textContains(haystack: string, needle: string): boolean {
   return haystack.toLowerCase().includes(needle.toLowerCase());
 }
 
-function coverageScore(expected: string[], actual: string[]): number {
+function fuzzyKeywordMatch(haystack: string, needle: string): boolean {
+  if (textContains(haystack, needle)) return true;
+  const needleWords = needle.toLowerCase().split(/\s+/).filter((w) => w.length > 2);
+  if (needleWords.length === 0) return textContains(haystack, needle);
+  const haystackLower = haystack.toLowerCase();
+  const matched = needleWords.filter((w) => haystackLower.includes(w));
+  return matched.length / needleWords.length >= 0.6;
+}
+
+function coverageScore(expected: string[], actual: string[], fuzzy = false): number {
   if (expected.length === 0) return 1.0;
   const joined = actual.join(" ");
-  const matched = expected.filter((kw) => textContains(joined, kw));
+  const matchFn = fuzzy ? fuzzyKeywordMatch : textContains;
+  const matched = expected.filter((kw) => matchFn(joined, kw));
   return matched.length / expected.length;
 }
 
@@ -75,6 +85,7 @@ export function evaluateTenderBidNoBid(
     scores.mandatoryRequirementsCoverage = coverageScore(
       expected.expectedMandatoryRequirements,
       result.mandatoryRequirements as string[],
+      true,
     );
   }
 

@@ -17,6 +17,7 @@ export const evalResultSchema = z.object({
   runId: z.string(),
   datasetVersion: z.string(),
   timestamp: z.string(),
+  gitCommit: z.string().optional(),
   summary: z.object({
     totalCases: z.number(),
     passedCases: z.number(),
