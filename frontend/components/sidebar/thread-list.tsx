@@ -4,8 +4,8 @@ import {
   ThreadListPrimitive,
   ThreadListItemPrimitive,
 } from "@assistant-ui/react";
-import { PlusIcon, TrashIcon } from "lucide-react";
-import type { FC } from "react";
+import { PlusIcon, TrashIcon, CheckIcon, XIcon } from "lucide-react";
+import { type FC, useState, useRef, useEffect, useCallback } from "react";
 
 export const ThreadList: FC = () => {
   return (
@@ -35,15 +35,53 @@ const ThreadListNew: FC = () => {
 };
 
 const ThreadListItem: FC = () => {
+  const [confirming, setConfirming] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  // Auto-cancel confirmation after 3 seconds
+  useEffect(() => {
+    if (confirming) {
+      timerRef.current = setTimeout(() => setConfirming(false), 3000);
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+      };
+    }
+  }, [confirming]);
+
+  const handleCancelConfirm = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setConfirming(false);
+  }, []);
+
   return (
     <ThreadListItemPrimitive.Root className="group relative my-0.5 flex items-center rounded-xl transition-all hover:bg-sidebar-accent/50 data-[active]:bg-sidebar-accent shadow-sm data-[active]:shadow-none border border-transparent data-[active]:border-border/40">
       <ThreadListItemPrimitive.Trigger className="flex-1 truncate px-4 py-2.5 text-left text-sm font-normal text-sidebar-foreground/80 group-data-[active]:font-medium group-data-[active]:text-foreground">
         <ThreadListItemPrimitive.Title fallback="Untitled Analysis" />
       </ThreadListItemPrimitive.Trigger>
       <div className="mr-2 flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100">
-        <ThreadListItemPrimitive.Delete className="flex size-7 items-center justify-center rounded-lg text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive">
-          <TrashIcon className="size-3.5" />
-        </ThreadListItemPrimitive.Delete>
+        {confirming ? (
+          <>
+            <ThreadListItemPrimitive.Delete className="flex size-7 items-center justify-center rounded-lg text-destructive transition-colors hover:bg-destructive/10">
+              <CheckIcon className="size-3.5" />
+            </ThreadListItemPrimitive.Delete>
+            <button
+              onClick={handleCancelConfirm}
+              className="flex size-7 items-center justify-center rounded-lg text-muted-foreground/60 transition-colors hover:bg-muted"
+            >
+              <XIcon className="size-3.5" />
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setConfirming(true);
+            }}
+            className="flex size-7 items-center justify-center rounded-lg text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
+          >
+            <TrashIcon className="size-3.5" />
+          </button>
+        )}
       </div>
     </ThreadListItemPrimitive.Root>
   );

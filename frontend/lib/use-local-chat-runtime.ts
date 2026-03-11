@@ -73,8 +73,8 @@ export const useLocalChatRuntime = <
         transport,
       });
 
-      // Restore messages from localStorage when switching threads
-      const prevIdRef = useRef(id);
+      // Restore messages from localStorage on initial load and when switching threads
+      const prevIdRef = useRef<string | null>(null);
       useEffect(() => {
         if (prevIdRef.current !== id) {
           prevIdRef.current = id;
