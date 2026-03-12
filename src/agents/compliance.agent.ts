@@ -2,7 +2,7 @@ import { Agent } from "@mastra/core/agent";
 import { google } from "@ai-sdk/google";
 
 export const complianceAgent = new Agent({
-  id: "compliance-analyst",
+  id: "complianceAgent",
   name: "Compliance Analyst",
   model: google("gemini-2.5-flash"),
   defaultOptions: { modelSettings: { temperature: 0 } },

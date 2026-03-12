@@ -7,7 +7,7 @@ import {
 } from "../tools/index.js";
 
 export const orchestratorAgent = new Agent({
-  id: "assistant",
+  id: "orchestratorAgent",
   name: "Assistant",
   model: google("gemini-2.5-flash"),
   instructions: `You are a versatile, knowledgeable assistant. You can have open-ended conversations, answer questions, explain concepts, brainstorm ideas, and provide advice on any topic — like a capable colleague who happens to also be an expert document analyst.

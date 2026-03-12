@@ -25,6 +25,22 @@ const MASTRA_URL =
 
 const transport = new AssistantChatTransport({
   api: `${MASTRA_URL}/chat/orchestratorAgent`,
+  prepareSendMessagesRequest: async (options) => {
+    // Strip empty tools and falsy system from the request body.
+    // Before the runtime is fully initialized, assistant-ui sends tools: {}
+    // and system: undefined which override the server agent's own tools and
+    // instructions, causing empty responses on the first message.
+    const { tools, system, ...bodyRest } = (options.body ?? {}) as Record<string, unknown>;
+    return {
+      body: {
+        ...bodyRest,
+        ...(system ? { system } : {}),
+        ...(tools && typeof tools === "object" && Object.keys(tools).length > 0
+          ? { tools }
+          : {}),
+      },
+    };
+  },
 });
 
 export default function Home() {

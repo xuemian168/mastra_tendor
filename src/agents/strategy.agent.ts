@@ -2,7 +2,7 @@ import { Agent } from "@mastra/core/agent";
 import { google } from "@ai-sdk/google";
 
 export const strategyAgent = new Agent({
-  id: "strategy-advisor",
+  id: "strategyAgent",
   name: "Strategy Advisor",
   model: google("gemini-2.5-pro"),
   defaultOptions: { modelSettings: { temperature: 0 } },

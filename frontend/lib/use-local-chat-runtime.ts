@@ -73,20 +73,20 @@ export const useLocalChatRuntime = <
         transport,
       });
 
-      // Restore messages from localStorage on initial load and when switching threads
+      // Restore messages from localStorage when switching threads
       const prevIdRef = useRef<string | null>(null);
       useEffect(() => {
         if (prevIdRef.current !== id) {
           prevIdRef.current = id;
           const stored = loadMessages(id);
-          if (stored.length > 0 && chat.messages.length === 0) {
+          if (stored.length > 0) {
             chat.setMessages(stored as UI_MESSAGE[]);
           }
         }
-      }, [id, chat.messages.length, chat.setMessages]);
+      }, [id, chat.setMessages]);
 
       // Persist messages to localStorage when new message is added or streaming finishes
-      const prevLenRef = useRef(chat.messages.length);
+      const prevLenRef = useRef(0);
       const prevStatusRef = useRef(chat.status);
       useEffect(() => {
         if (chat.messages.length === 0) return;
@@ -102,6 +102,18 @@ export const useLocalChatRuntime = <
           saveMessages(id, chat.messages);
         }
       }, [id, chat.messages, chat.status]);
+
+      // Save messages before page unload to capture any unsaved state
+      useEffect(() => {
+        const handleBeforeUnload = () => {
+          if (chat.messages.length > 0) {
+            saveMessages(id, chat.messages);
+          }
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () =>
+          window.removeEventListener("beforeunload", handleBeforeUnload);
+      }, [id, chat.messages]);
 
       const runtime = useAISDKRuntime(chat, { adapters });
 
