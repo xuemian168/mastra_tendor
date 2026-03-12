@@ -13,7 +13,7 @@ import {
   AssistantChatTransport,
 } from "@assistant-ui/react-ai-sdk";
 import { type ChatInit, type ChatTransport } from "ai";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { LocalThreadListAdapter } from "./local-thread-list-adapter";
 import { loadMessages, saveMessages } from "./message-store";
 
