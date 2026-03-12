@@ -30,18 +30,17 @@ const transport = new AssistantChatTransport({
     // Before the runtime is fully initialized, assistant-ui sends tools: {}
     // and system: undefined which override the server agent's own tools and
     // instructions, causing empty responses on the first message.
-    const body = options.body as Record<string, unknown> | undefined;
-    if (body) {
-      if (!body.system) delete body.system;
-      if (
-        body.tools &&
-        typeof body.tools === "object" &&
-        Object.keys(body.tools).length === 0
-      ) {
-        delete body.tools;
-      }
+    const body = { ...options.body } as Record<string, unknown>;
+    if (!body.system) delete body.system;
+    if (
+      body.tools &&
+      typeof body.tools === "object" &&
+      Object.keys(body.tools as object).length === 0
+    ) {
+      delete body.tools;
     }
-    return undefined;
+    body.messages = options.messages;
+    return { body };
   },
 });
 
