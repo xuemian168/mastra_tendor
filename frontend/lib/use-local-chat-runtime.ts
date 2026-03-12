@@ -85,14 +85,23 @@ export const useLocalChatRuntime = <
         }
       }, [id, chat.messages.length, chat.setMessages]);
 
-      // Persist messages to localStorage when they change
+      // Persist messages to localStorage when new message is added or streaming finishes
       const prevLenRef = useRef(chat.messages.length);
+      const prevStatusRef = useRef(chat.status);
       useEffect(() => {
-        if (chat.messages.length > 0 && chat.messages.length !== prevLenRef.current) {
-          prevLenRef.current = chat.messages.length;
+        if (chat.messages.length === 0) return;
+
+        const lengthChanged = chat.messages.length !== prevLenRef.current;
+        const streamingDone =
+          prevStatusRef.current !== "ready" && chat.status === "ready";
+
+        prevLenRef.current = chat.messages.length;
+        prevStatusRef.current = chat.status;
+
+        if (lengthChanged || streamingDone) {
           saveMessages(id, chat.messages);
         }
-      }, [id, chat.messages]);
+      }, [id, chat.messages, chat.status]);
 
       const runtime = useAISDKRuntime(chat, { adapters });
 
