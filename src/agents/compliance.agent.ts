@@ -2,8 +2,10 @@ import { Agent } from "@mastra/core/agent";
 import { google } from "@ai-sdk/google";
 
 export const complianceAgent = new Agent({
+  id: "compliance-analyst",
   name: "Compliance Analyst",
   model: google("gemini-2.5-flash"),
+  defaultOptions: { modelSettings: { temperature: 0 } },
   instructions: `Extract compliance requirements from tender documents. Be thorough—extract exact values, dates, and thresholds.
 
 You MUST extract these categories separately:

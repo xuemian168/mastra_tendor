@@ -24,10 +24,33 @@ let datasetVersion = "v1";
 let filterTag: string | undefined;
 let filterCase: string | undefined;
 
+if (args.includes("--help") || args.includes("-h")) {
+  console.log(`
+Usage: npm run eval [options]
+
+Options:
+  --dataset <version>  Dataset version to use (default: v1)
+  --case <id>          Run a single test case by ID (e.g. tender-001)
+  --filter <tag>       Run only cases matching a tag (e.g. regression, core, edge-case)
+  --help, -h           Show this help message
+
+Examples:
+  npm run eval                          # Run all v1 cases
+  npm run eval -- --case tender-001     # Run single case
+  npm run eval -- --filter regression   # Run cases tagged 'regression'
+  npm run eval -- --dataset v2          # Use a different dataset version
+`);
+  process.exit(0);
+}
+
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--dataset" && args[i + 1]) datasetVersion = args[++i];
-  if (args[i] === "--filter" && args[i + 1]) filterTag = args[++i];
-  if (args[i] === "--case" && args[i + 1]) filterCase = args[++i];
+  else if (args[i] === "--filter" && args[i + 1]) filterTag = args[++i];
+  else if (args[i] === "--case" && args[i + 1]) filterCase = args[++i];
+  else if (args[i]?.startsWith("--")) {
+    console.error(`Unknown option: ${args[i]}\nRun with --help for usage.`);
+    process.exit(1);
+  }
 }
 
 async function loadDataset(version: string) {
@@ -172,6 +195,15 @@ async function main() {
     cases = cases.filter((c) => c.id === filterCase);
   } else if (filterTag) {
     cases = cases.filter((c) => c.tags?.includes(filterTag!));
+  }
+
+  if (cases.length === 0) {
+    const hint = filterCase
+      ? `No case found with id "${filterCase}".`
+      : `No cases found with tag "${filterTag}".`;
+    const ids = dataset.cases.map((c) => c.id).join(", ");
+    console.error(`${hint}\nAvailable case IDs: ${ids}`);
+    process.exit(1);
   }
 
   console.log(`Running ${cases.length} case(s)...\n`);
