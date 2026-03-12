@@ -29,23 +29,31 @@ const transport = new AssistantChatTransport({
     if (init?.body && typeof init.body === "string") {
       const body = JSON.parse(init.body);
       // Only keep fields that Mastra handleChatStream expects.
-      const cleaned: Record<string, unknown> = { messages: body.messages };
-      if (body.system) cleaned.system = body.system;
+      // Avoids leaking extra fields (tools, metadata, trigger) into agent options.
+      const cleaned: Record<string, unknown> = {};
+      // Move system prompt (company profile) into the first user message
+      // to avoid double system prompts that overwhelm Gemini's thinking budget.
+      const messages = Array.isArray(body.messages) ? [...body.messages] : [];
+      if (body.system && messages.length > 0) {
+        const firstUserIdx = messages.findIndex(
+          (m: { role: string }) => m.role === "user",
+        );
+        if (firstUserIdx !== -1) {
+          const msg = { ...messages[firstUserIdx] };
+          const parts = Array.isArray(msg.parts) ? [...msg.parts] : [];
+          // Prepend company profile as context before user's text
+          parts.unshift({ type: "text", text: `${body.system}\n\n---\n\n` });
+          msg.parts = parts;
+          messages[firstUserIdx] = msg;
+        }
+      }
+      cleaned.messages = messages;
       if (body.id) cleaned.id = body.id;
       if (body.runId) cleaned.runId = body.runId;
       if (body.resumeData) cleaned.resumeData = body.resumeData;
       init = { ...init, body: JSON.stringify(cleaned) };
     }
-    // Debug: detect if request gets aborted
-    const signal = init?.signal;
-    if (signal) {
-      signal.addEventListener("abort", () => {
-        console.error("[transport] REQUEST ABORTED!", signal.reason);
-      });
-    }
-    const resp = await globalThis.fetch(url, init);
-    console.log("[transport] response received, aborted:", signal?.aborted);
-    return resp;
+    return globalThis.fetch(url, init);
   },
 });
 
@@ -58,14 +66,12 @@ export default function Home() {
     companyName: "",
     description: "",
   });
-  const [profileLoaded, setProfileLoaded] = useState(false);
   const hasProfile = profile.description.trim().length > 0;
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     const loaded = loadProfile();
     setProfile(loaded);
-    setProfileLoaded(true);
     if (!loaded.description.trim()) {
       setDialogOpen(true);
     }
