@@ -27,9 +27,17 @@ export const decomposeGoalTool = createTool({
       .optional()
       .describe("Short label of the document type (e.g. 'software license agreement', 'consulting contract'). Do NOT paste the full document text here."),
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
+    const emit = async (stage: string) => {
+      await context?.writer?.custom({
+        type: "data-tool-stage" as const,
+        data: { toolName: "decompose-goal", stage },
+      });
+    };
+
     tokenTracker.startStep("decompose-goal-tool");
     try {
+      await emit(`Analyzing goal: ${inputData.goal.slice(0, 80)}${inputData.goal.length > 80 ? "..." : ""}`);
       const contextHint = inputData.documentContext
         ? `\nDocument type: ${inputData.documentContext}`
         : "";
@@ -44,6 +52,7 @@ Rules:
 - Order sub-tasks logically (foundational analysis first, synthesis last)
 - Keep each analysisGoal concise (1-2 sentences)`;
 
+      await emit("Decomposing into sub-tasks");
       const result = await generalAnalystAgent.generate(prompt, {
         structuredOutput: { schema: decomposeOutputSchema },
       });

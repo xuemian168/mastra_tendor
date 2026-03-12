@@ -19,7 +19,14 @@ export const summarizeDocumentTool = createTool({
     documentTitle: z.string().optional(),
     fullText: z.string().optional().describe("DEPRECATED: Do not pass. The system retrieves document text automatically by indexName."),
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
+    const emit = async (stage: string) => {
+      await context?.writer?.custom({
+        type: "data-tool-stage" as const,
+        data: { toolName: "summarize-document", stage },
+      });
+    };
+
     tokenTracker.startStep("summarize-document-tool");
     try {
       const task = "Summarize the following document. Provide a clear title, overview, key points, and section-by-section breakdown.";
@@ -30,8 +37,10 @@ export const summarizeDocumentTool = createTool({
       const docTitle = inputData.documentTitle ?? cached?.documentTitle;
 
       if (fullText) {
+        await emit("Using cached full text");
         prompt = buildTenderPrompt(task, fullText, docTitle);
       } else {
+        await emit("Retrieved relevant chunks");
         const chunks = await retrieveForAgent(
           vectorStore,
           inputData.indexName,
@@ -41,6 +50,7 @@ export const summarizeDocumentTool = createTool({
         prompt = buildRagPrompt(task, chunks, docTitle);
       }
 
+      await emit("Generating structured summary");
       const result = await generalAnalystAgent.generate(prompt, {
         structuredOutput: { schema: summaryOutputSchema },
       });
@@ -49,6 +59,7 @@ export const summarizeDocumentTool = createTool({
         tokenTracker.record("summarize-document-tool", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
       }
 
+      await emit("Summary complete");
       tokenTracker.completeStep("summarize-document-tool");
       return result.object;
     } catch (error) {

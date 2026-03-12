@@ -2,17 +2,7 @@
 
 import { useState } from "react";
 import type { ToolCallMessagePartProps } from "@assistant-ui/react";
-
-const TOOL_PROGRESS_TEXT: Record<string, string> = {
-  "ingest-document": "Chunking and indexing document...",
-  "analyze-compliance": "Extracting compliance requirements...",
-  "assess-risk": "Evaluating risk factors...",
-  "recommend-strategy": "Synthesizing recommendation...",
-  "analyze-document": "Analyzing document content...",
-  "summarize-document": "Generating structured summary...",
-  "decompose-goal": "Breaking down analysis goals...",
-  "web-search": "Searching the web...",
-};
+import { useToolStages } from "@/hooks/use-tool-stages";
 
 const TOOL_META: Record<string, { label: string; icon: string }> = {
   "ingest-document": { label: "Document Ingestion", icon: "\u{1F4C4}" },
@@ -39,12 +29,13 @@ export function ToolCallDisplay(props: ToolCallMessagePartProps) {
   return <ThinkingStep {...props} />;
 }
 
-/* ── Collapsible thinking step for non-strategy tools ── */
+/* ── Collapsible thinking step with real-time stages ── */
 
 function ThinkingStep({ toolName, result, status }: ToolCallMessagePartProps) {
   const [expanded, setExpanded] = useState(false);
   const meta = TOOL_META[toolName] ?? { label: toolName, icon: "\u{1F527}" };
   const isRunning = status.type === "running";
+  const stages = useToolStages(toolName);
 
   return (
     <div className="my-2 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm overflow-hidden not-prose">
@@ -56,13 +47,31 @@ function ThinkingStep({ toolName, result, status }: ToolCallMessagePartProps) {
         <span className="font-medium flex-1">{meta.label}</span>
         {isRunning ? (
           <span className="thinking-dot text-[var(--primary)] text-xs">
-            {TOOL_PROGRESS_TEXT[toolName] ?? "Processing..."}
+            {stages.length > 0 ? stages[stages.length - 1] : "Starting..."}
           </span>
         ) : (
           <span className="text-xs text-[var(--muted-foreground)]">Done</span>
         )}
         <ChevronIcon expanded={expanded} />
       </button>
+
+      {/* Real-time stages during execution */}
+      {isRunning && stages.length > 0 && (
+        <div className="border-t border-[var(--border)] px-3 py-2">
+          <ol className="space-y-0.5">
+            {stages.map((stage, i) => (
+              <li key={i} className="flex items-center gap-1.5 text-xs text-[var(--muted-foreground)]">
+                {i < stages.length - 1 ? (
+                  <span className="text-green-500 shrink-0">{"\u2713"}</span>
+                ) : (
+                  <span className="text-blue-500 shrink-0 animate-pulse">{"\u25CF"}</span>
+                )}
+                <span>{stage}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
 
       {expanded && result != null && (
         <div className="border-t border-[var(--border)] px-3 py-3">
@@ -98,7 +107,6 @@ function IngestResult({ data }: { data: any }) {
         <span>{data.chunkCount === 0 ? "Full text (below RAG threshold)" : `${data.chunkCount} segments`}</span>
       </div>
       <div className="text-[var(--muted-foreground)]">{data.message}</div>
-      <StagesList stages={data.stages} />
     </div>
   );
 }
@@ -113,7 +121,6 @@ function ComplianceResult({ data }: { data: any }) {
         <ListSection title="Mandatory Requirements" items={data.mandatoryRequirements} max={5} />
         <ListSection title="Qualifications" items={data.qualifications} />
       </div>
-      <StagesList stages={data.stages} />
     </div>
   );
 }
@@ -144,7 +151,6 @@ function RiskResult({ data }: { data: any }) {
       <p className="text-[var(--foreground)]">{data.summary}</p>
       <ListSection title="Penalty Clauses" items={data.penaltyClauses} max={4} />
       <ListSection title="Delivery Risks" items={data.deliveryRisks} max={4} />
-      <StagesList stages={data.stages} />
     </div>
   );
 }
@@ -465,25 +471,6 @@ function Badge({ label, value }: { label: string; value?: string }) {
       <span className={`rounded px-1.5 py-0.5 font-medium ${colors[value.toLowerCase()] ?? "bg-[var(--muted)]"}`}>
         {value}
       </span>
-    </div>
-  );
-}
-
-function StagesList({ stages }: { stages?: string[] }) {
-  if (!stages?.length) return null;
-  return (
-    <div className="mt-2 pt-2 border-t border-[var(--border)]">
-      <div className="text-[10px] uppercase tracking-wider text-[var(--muted-foreground)] mb-1">
-        Execution Steps
-      </div>
-      <ol className="space-y-0.5">
-        {stages.map((stage, i) => (
-          <li key={i} className="flex items-center gap-1.5 text-xs text-[var(--muted-foreground)]">
-            <span className="text-green-500 shrink-0">{"\u2713"}</span>
-            <span>{stage}</span>
-          </li>
-        ))}
-      </ol>
     </div>
   );
 }

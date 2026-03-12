@@ -19,13 +19,23 @@ export const ingestDocumentTool = createTool({
     documentText: z.string().describe("The full text of the document to ingest"),
     documentTitle: z.string().optional().describe("Optional title of the document"),
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
+    const emit = async (stage: string) => {
+      await context?.writer?.custom({
+        type: "data-tool-stage" as const,
+        data: { toolName: "ingest-document", stage },
+      });
+    };
+
     tokenTracker.startStep("ingest-tool");
     const docId = `doc-${Date.now()}`;
     const indexName = `index-${docId}`;
 
+    await emit(`Received document (${inputData.documentText.length} chars)`);
+
     if (inputData.documentText.length < RAG_THRESHOLD) {
       documentCache.set(indexName, inputData.documentText, inputData.documentTitle);
+      await emit(`Below RAG threshold (${RAG_THRESHOLD}) — cached as full text`);
       tokenTracker.completeStep("ingest-tool");
       return {
         documentId: docId,
@@ -33,15 +43,14 @@ export const ingestDocumentTool = createTool({
         indexName,
         documentTitle: inputData.documentTitle,
         message: `Document ingested as full text (${inputData.documentText.length} chars, below RAG threshold).`,
-        stages: [
-          `Received document (${inputData.documentText.length} chars)`,
-          `Below RAG threshold (${RAG_THRESHOLD}) — cached as full text`,
-        ],
       };
     }
 
     const chunks = chunkTenderDocument(inputData.documentText, docId);
+    await emit(`Chunked into ${chunks.length} segments`);
+
     const vectors = await embedTexts(chunks.map((c) => c.content));
+    await emit(`Embedded ${chunks.length} chunks (${DIMENSION}d vectors)`);
 
     await vectorStore.createIndex({ indexName, dimension: DIMENSION });
     await vectorStore.upsert({
@@ -50,6 +59,7 @@ export const ingestDocumentTool = createTool({
       metadata: chunks.map((c) => ({ ...c.metadata, content: c.content })),
       ids: chunks.map((c) => c.id),
     });
+    await emit(`Stored in vector index "${indexName}"`);
 
     const estimatedTokens = Math.ceil(inputData.documentText.length / 4);
     tokenTracker.record("ingest-tool-embedding", estimatedTokens, 0);
@@ -61,12 +71,6 @@ export const ingestDocumentTool = createTool({
       indexName,
       documentTitle: inputData.documentTitle,
       message: `Document chunked into ${chunks.length} segments and indexed.`,
-      stages: [
-        `Received document (${inputData.documentText.length} chars)`,
-        `Chunked into ${chunks.length} segments`,
-        `Embedded ${chunks.length} chunks (${DIMENSION}d vectors)`,
-        `Stored in vector index "${indexName}"`,
-      ],
     };
   },
 });

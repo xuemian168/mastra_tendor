@@ -17,7 +17,15 @@ export const webSearchTool = createTool({
   inputSchema: z.object({
     query: z.string().describe("The search query"),
   }),
-  execute: async ({ query }) => {
+  execute: async ({ query }, context) => {
+    const emit = async (stage: string) => {
+      await context?.writer?.custom({
+        type: "data-tool-stage" as const,
+        data: { toolName: "web-search", stage },
+      });
+    };
+
+    await emit(`Searching: ${query}`);
     const response = await getTavily().search(query, {
       maxResults: 5,
       includeAnswer: true,
@@ -29,6 +37,7 @@ export const webSearchTool = createTool({
       snippet: r.content,
     }));
 
+    await emit(`Found ${response.results.length} results`);
     return {
       query,
       answer: response.answer,

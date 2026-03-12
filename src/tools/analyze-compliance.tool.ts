@@ -19,7 +19,14 @@ export const analyzeComplianceTool = createTool({
     documentTitle: z.string().optional(),
     fullText: z.string().optional().describe("DEPRECATED: Do not pass. The system retrieves document text automatically by indexName."),
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
+    const emit = async (stage: string) => {
+      await context?.writer?.custom({
+        type: "data-tool-stage" as const,
+        data: { toolName: "analyze-compliance", stage },
+      });
+    };
+
     tokenTracker.startStep("compliance-tool");
     try {
       let prompt: string;
@@ -29,12 +36,14 @@ export const analyzeComplianceTool = createTool({
       const docTitle = inputData.documentTitle ?? cached?.documentTitle;
 
       if (fullText) {
+        await emit("Using cached full text");
         prompt = buildTenderPrompt(
           "Analyze the following document for compliance requirements.",
           fullText,
           docTitle,
         );
       } else {
+        await emit(`Retrieved relevant chunks from "${inputData.indexName}"`);
         const chunks = await retrieveForAgent(
           vectorStore,
           inputData.indexName,
@@ -48,6 +57,7 @@ export const analyzeComplianceTool = createTool({
         );
       }
 
+      await emit("Analyzing compliance requirements");
       const result = await complianceAgent.generate(prompt, {
         structuredOutput: { schema: complianceOutputSchema },
       });
@@ -57,18 +67,10 @@ export const analyzeComplianceTool = createTool({
       }
 
       const output = result.object as Record<string, unknown>;
+      await emit("Generated structured compliance report");
       tokenTracker.completeStep("compliance-tool");
 
-      const stages: string[] = [];
-      if (fullText) {
-        stages.push("Using cached full text");
-      } else {
-        stages.push(`Retrieved relevant chunks from "${inputData.indexName}"`);
-      }
-      stages.push("Analyzing compliance requirements");
-      stages.push("Generated structured compliance report");
-
-      return { ...output, stages };
+      return output;
     } catch (error) {
       tokenTracker.completeStep("compliance-tool");
       return {

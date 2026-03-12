@@ -26,8 +26,16 @@ export const recommendStrategyTool = createTool({
     riskSummary: z.string().describe("Summary from risk assessment"),
     companyProfile: z.string().optional().describe("Optional company profile for context"),
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
+    const emit = async (stage: string) => {
+      await context?.writer?.custom({
+        type: "data-tool-stage" as const,
+        data: { toolName: "recommend-strategy", stage },
+      });
+    };
+
     tokenTracker.startStep("strategy-tool");
+    await emit("Compiling compliance and risk data");
     let prompt = `Based on the following analyses, provide a Bid/No-Bid recommendation.
 
 ## Compliance Analysis
@@ -56,16 +64,20 @@ export const recommendStrategyTool = createTool({
         embedQuery,
       );
       if (historicalCases.length > 0) {
+        await emit(`Found ${historicalCases.length} historical references`);
         prompt += "\n\n## Historical Reference";
         for (const h of historicalCases) {
           prompt += `\n- [${h.decision}] ${h.tenderTitle} (confidence: ${h.confidenceScore}%): ${h.summary}`;
         }
+      } else {
+        await emit("No historical references found");
       }
     } catch {
       // History retrieval is best-effort
     }
 
     try {
+      await emit("Synthesizing Bid/No-Bid recommendation");
       const result = await strategyAgent.generate(prompt, {
         structuredOutput: { schema: strategyOutputSchema },
       });

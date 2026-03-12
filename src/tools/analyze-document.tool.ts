@@ -20,7 +20,14 @@ export const analyzeDocumentTool = createTool({
     documentTitle: z.string().optional(),
     fullText: z.string().optional().describe("DEPRECATED: Do not pass. The system retrieves document text automatically by indexName."),
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
+    const emit = async (stage: string) => {
+      await context?.writer?.custom({
+        type: "data-tool-stage" as const,
+        data: { toolName: "analyze-document", stage },
+      });
+    };
+
     tokenTracker.startStep("analyze-document-tool");
     try {
       const task = `Analyze the following document. Analysis goal: ${inputData.analysisGoal}`;
@@ -31,8 +38,10 @@ export const analyzeDocumentTool = createTool({
       const docTitle = inputData.documentTitle ?? cached?.documentTitle;
 
       if (fullText) {
+        await emit("Using cached full text");
         prompt = buildTenderPrompt(task, fullText, docTitle);
       } else {
+        await emit("Retrieved relevant chunks");
         const chunks = await retrieveForAgent(
           vectorStore,
           inputData.indexName,
@@ -42,6 +51,7 @@ export const analyzeDocumentTool = createTool({
         prompt = buildRagPrompt(task, chunks, docTitle);
       }
 
+      await emit(`Analyzing document: ${inputData.analysisGoal}`);
       const result = await generalAnalystAgent.generate(prompt, {
         structuredOutput: { schema: generalAnalysisOutputSchema },
       });
@@ -50,6 +60,7 @@ export const analyzeDocumentTool = createTool({
         tokenTracker.record("analyze-document-tool", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
       }
 
+      await emit("Generated analysis report");
       tokenTracker.completeStep("analyze-document-tool");
       return result.object;
     } catch (error) {
