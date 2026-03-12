@@ -25,22 +25,27 @@ const MASTRA_URL =
 
 const transport = new AssistantChatTransport({
   api: `${MASTRA_URL}/chat/orchestratorAgent`,
-  prepareSendMessagesRequest: async (options) => {
-    // Strip empty tools and falsy system from the request body.
-    // Before the runtime is fully initialized, assistant-ui sends tools: {}
-    // and system: undefined which override the server agent's own tools and
-    // instructions, causing empty responses on the first message.
-    const body = { ...options.body } as Record<string, unknown>;
-    if (!body.system) delete body.system;
-    if (
-      body.tools &&
-      typeof body.tools === "object" &&
-      Object.keys(body.tools as object).length === 0
-    ) {
-      delete body.tools;
+  fetch: async (url, init) => {
+    if (init?.body && typeof init.body === "string") {
+      const body = JSON.parse(init.body);
+      // Only keep fields that Mastra handleChatStream expects.
+      const cleaned: Record<string, unknown> = { messages: body.messages };
+      if (body.system) cleaned.system = body.system;
+      if (body.id) cleaned.id = body.id;
+      if (body.runId) cleaned.runId = body.runId;
+      if (body.resumeData) cleaned.resumeData = body.resumeData;
+      init = { ...init, body: JSON.stringify(cleaned) };
     }
-    body.messages = options.messages;
-    return { body };
+    // Debug: detect if request gets aborted
+    const signal = init?.signal;
+    if (signal) {
+      signal.addEventListener("abort", () => {
+        console.error("[transport] REQUEST ABORTED!", signal.reason);
+      });
+    }
+    const resp = await globalThis.fetch(url, init);
+    console.log("[transport] response received, aborted:", signal?.aborted);
+    return resp;
   },
 });
 
