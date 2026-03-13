@@ -1,7 +1,7 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 import { generalAnalystAgent } from "../agents/general-analyst.agent.js";
-import { tokenTracker } from "../utils/token-tracker.js";
+import { createEmit, withTokenTracking, recordUsage } from "./tool-helpers.js";
 
 const decomposeOutputSchema = z.object({
   originalGoal: z.string(),
@@ -28,15 +28,9 @@ export const decomposeGoalTool = createTool({
       .describe("Short label of the document type (e.g. 'software license agreement', 'consulting contract'). Do NOT paste the full document text here."),
   }),
   execute: async (inputData, context) => {
-    const emit = async (stage: string) => {
-      await context?.writer?.custom({
-        type: "data-tool-stage" as const,
-        data: { toolName: "decompose-goal", stage },
-      });
-    };
+    const emit = createEmit(context, "decompose-goal");
 
-    tokenTracker.startStep("decompose-goal-tool");
-    try {
+    return withTokenTracking("decompose-goal-tool", async () => {
       await emit(`Analyzing goal: ${inputData.goal.slice(0, 80)}${inputData.goal.length > 80 ? "..." : ""}`);
       const contextHint = inputData.documentContext
         ? `\nDocument type: ${inputData.documentContext}`
@@ -56,23 +50,9 @@ Rules:
       const result = await generalAnalystAgent.generate(prompt, {
         structuredOutput: { schema: decomposeOutputSchema },
       });
+      recordUsage("decompose-goal-tool", result.usage);
 
-      if (result.usage) {
-        tokenTracker.record(
-          "decompose-goal-tool",
-          result.usage.inputTokens ?? 0,
-          result.usage.outputTokens ?? 0,
-        );
-      }
-
-      tokenTracker.completeStep("decompose-goal-tool");
       return result.object;
-    } catch (error) {
-      tokenTracker.completeStep("decompose-goal-tool");
-      return {
-        error: true,
-        message: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
-      };
-    }
+    });
   },
 });

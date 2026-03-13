@@ -23,6 +23,19 @@ import { SparklesIcon, Building2Icon } from "lucide-react";
 const MASTRA_URL =
   process.env.NEXT_PUBLIC_MASTRA_URL || "http://localhost:4111";
 
+/**
+ * fetch 拦截器：清理请求体并重定向 system prompt。
+ *
+ * 背景：CompanyProfileInstructions 通过 useAssistantInstructions 将公司资料
+ * 设置到 body.system 字段。但 orchestrator agent 已有较长的系统指令，
+ * 双重 system prompt 会导致 Gemini 2.5 Flash 耗尽 thinking budget 返回空内容。
+ *
+ * 方案：拦截 fetch 请求，将 body.system（公司资料）移入第一条用户消息的 parts 中，
+ * 作为上下文而非 system prompt 发送，同时清理 assistant-ui 附加的多余字段。
+ *
+ * 注意：此拦截器仅修改 HTTP 请求体，不影响 React 状态（chat.messages），
+ * 因此 localStorage 持久化和标题生成不受影响。
+ */
 const transport = new AssistantChatTransport({
   api: `${MASTRA_URL}/chat/orchestratorAgent`,
   fetch: async (url, init) => {

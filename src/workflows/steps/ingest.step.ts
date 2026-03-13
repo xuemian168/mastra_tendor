@@ -5,9 +5,7 @@ import { chunkTenderDocument } from "../../rag/chunker.js";
 import { embedTexts } from "../../rag/embedder.js";
 import { vectorStore } from "../../rag/in-memory-vector-store.js";
 import { tokenTracker } from "../../utils/token-tracker.js";
-
-const DIMENSION = 3072;
-const RAG_THRESHOLD = 40000; // ~10 pages, below this full-text is cheaper than RAG
+import { EMBEDDING_DIMENSION, WORKFLOW_RAG_THRESHOLD } from "../../rag/constants.js";
 
 export const ingestStep = createStep({
   id: "ingest-step",
@@ -18,7 +16,7 @@ export const ingestStep = createStep({
     const tenderId = `tender-${Date.now()}`;
     const indexName = `index-${tenderId}`;
 
-    if (inputData.tenderText.length < RAG_THRESHOLD) {
+    if (inputData.tenderText.length < WORKFLOW_RAG_THRESHOLD) {
       tokenTracker.completeStep("ingest-step");
       return {
         tenderId,
@@ -33,7 +31,7 @@ export const ingestStep = createStep({
 
     const vectors = await embedTexts(chunks.map((c) => c.content));
 
-    await vectorStore.createIndex({ indexName, dimension: DIMENSION });
+    await vectorStore.createIndex({ indexName, dimension: EMBEDDING_DIMENSION });
     await vectorStore.upsert({
       indexName,
       vectors,

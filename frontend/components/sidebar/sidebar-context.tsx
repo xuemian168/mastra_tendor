@@ -8,6 +8,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
+import { getRawStorage, setRawStorage } from "@/lib/storage";
 
 const SIDEBAR_STORAGE_KEY = "sidebar-open";
 
@@ -28,8 +29,8 @@ export function useSidebar(): SidebarContextValue {
 
 function getInitialOpen(): boolean {
   if (typeof window === "undefined") return true;
-  const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
-  if (stored !== null) return stored === "true";
+  const stored = getRawStorage(SIDEBAR_STORAGE_KEY, "");
+  if (stored !== "") return stored === "true";
   return window.matchMedia("(min-width: 768px)").matches;
 }
 
@@ -37,7 +38,7 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(getInitialOpen);
 
   useEffect(() => {
-    localStorage.setItem(SIDEBAR_STORAGE_KEY, String(isOpen));
+    setRawStorage(SIDEBAR_STORAGE_KEY, String(isOpen));
   }, [isOpen]);
 
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);

@@ -4,6 +4,25 @@ import { useState } from "react";
 import type { ToolCallMessagePartProps } from "@assistant-ui/react";
 import { useToolStages } from "@/hooks/use-tool-stages";
 
+/** Shared severity/level color mappings (DRY: used by RiskResult, AnalyzeDocumentResult, Badge) */
+const SEVERITY_BADGE_COLORS: Record<string, string> = {
+  low: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  medium: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
+  high: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
+  critical: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+  feasible: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  tight: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
+  unfeasible: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+};
+
+/** Risk indicator style (lighter bg, used for the overall risk level pill) */
+const RISK_INDICATOR_COLORS: Record<string, string> = {
+  low: "text-green-600 bg-green-50 dark:bg-green-950",
+  medium: "text-yellow-600 bg-yellow-50 dark:bg-yellow-950",
+  high: "text-orange-600 bg-orange-50 dark:bg-orange-950",
+  critical: "text-red-600 bg-red-50 dark:bg-red-950",
+};
+
 const TOOL_META: Record<string, { label: string; icon: string }> = {
   "ingest-document": { label: "Document Ingestion", icon: "\u{1F4C4}" },
   "analyze-compliance": { label: "Compliance Analysis", icon: "\u{2705}" },
@@ -126,12 +145,6 @@ function ComplianceResult({ data }: { data: any }) {
 }
 
 function RiskResult({ data }: { data: any }) {
-  const riskColors: Record<string, string> = {
-    low: "text-green-600 bg-green-50 dark:bg-green-950",
-    medium: "text-yellow-600 bg-yellow-50 dark:bg-yellow-950",
-    high: "text-orange-600 bg-orange-50 dark:bg-orange-950",
-    critical: "text-red-600 bg-red-50 dark:bg-red-950",
-  };
   const level = data.overallRiskLevel?.toLowerCase() ?? "medium";
   const diff = data.difficultyAssessment ?? {};
 
@@ -139,7 +152,7 @@ function RiskResult({ data }: { data: any }) {
     <div className="space-y-3 text-xs">
       <div className="flex items-center gap-2">
         <span className="text-[var(--muted-foreground)]">Overall Risk:</span>
-        <span className={`rounded px-2 py-0.5 font-semibold uppercase ${riskColors[level] ?? ""}`}>
+        <span className={`rounded px-2 py-0.5 font-semibold uppercase ${RISK_INDICATOR_COLORS[level] ?? ""}`}>
           {data.overallRiskLevel}
         </span>
       </div>
@@ -186,13 +199,6 @@ function DecomposeResult({ data }: { data: any }) {
 }
 
 function AnalyzeDocumentResult({ data }: { data: any }) {
-  const importanceColors: Record<string, string> = {
-    low: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-    medium: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
-    high: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
-    critical: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
-  };
-
   return (
     <div className="space-y-2 text-xs">
       {data.analysisType && (
@@ -210,7 +216,7 @@ function AnalyzeDocumentResult({ data }: { data: any }) {
           <ul className="space-y-1">
             {data.keyFindings.map((f: any, i: number) => (
               <li key={i} className="flex items-start gap-2">
-                <span className={`shrink-0 mt-0.5 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${importanceColors[f.importance] ?? "bg-[var(--muted)]"}`}>
+                <span className={`shrink-0 mt-0.5 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${SEVERITY_BADGE_COLORS[f.importance] ?? "bg-[var(--muted)]"}`}>
                   {f.importance}
                 </span>
                 <div>
@@ -457,18 +463,10 @@ function ListSection({ title, items, max }: { title: string; items?: string[]; m
 
 function Badge({ label, value }: { label: string; value?: string }) {
   if (!value) return null;
-  const colors: Record<string, string> = {
-    low: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-    medium: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
-    high: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
-    feasible: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-    tight: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
-    unfeasible: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
-  };
   return (
     <div className="flex items-center gap-1.5">
       <span className="text-[var(--muted-foreground)]">{label}:</span>
-      <span className={`rounded px-1.5 py-0.5 font-medium ${colors[value.toLowerCase()] ?? "bg-[var(--muted)]"}`}>
+      <span className={`rounded px-1.5 py-0.5 font-medium ${SEVERITY_BADGE_COLORS[value.toLowerCase()] ?? "bg-[var(--muted)]"}`}>
         {value}
       </span>
     </div>

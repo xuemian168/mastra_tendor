@@ -1,8 +1,8 @@
 import type { HistoricalAnalysis } from "./types.js";
 import { InMemoryVectorStore } from "./in-memory-vector-store.js";
+import { EMBEDDING_DIMENSION } from "./constants.js";
 
 const HISTORY_INDEX = "historical-analyses";
-const DIMENSION = 3072;
 
 export class HistoryStore {
   private store = new InMemoryVectorStore();
@@ -11,7 +11,7 @@ export class HistoryStore {
 
   private async ensureIndex(): Promise<void> {
     if (!this.initialized) {
-      await this.store.createIndex({ indexName: HISTORY_INDEX, dimension: DIMENSION });
+      await this.store.createIndex({ indexName: HISTORY_INDEX, dimension: EMBEDDING_DIMENSION });
       this.initialized = true;
     }
   }

@@ -7,6 +7,7 @@ import type {
 import type { ThreadMessage } from "@assistant-ui/core";
 import { createAssistantStream } from "assistant-stream";
 import { deleteMessages } from "./message-store";
+import { getStorage, setStorage } from "./storage";
 
 const STORAGE_KEY = "aui-threads";
 
@@ -18,17 +19,11 @@ type StoredThread = {
 };
 
 function readThreads(): StoredThread[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as StoredThread[]) : [];
-  } catch {
-    return [];
-  }
+  return getStorage<StoredThread[]>(STORAGE_KEY, []);
 }
 
 function writeThreads(threads: StoredThread[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(threads));
+  setStorage(STORAGE_KEY, threads);
 }
 
 function updateThread(

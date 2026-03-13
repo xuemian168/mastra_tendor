@@ -1,6 +1,7 @@
 import { createTool } from "@mastra/core/tools";
 import { tavily } from "@tavily/core";
 import { z } from "zod";
+import { createEmit } from "./tool-helpers.js";
 
 let tvly: ReturnType<typeof tavily>;
 function getTavily() {
@@ -18,12 +19,7 @@ export const webSearchTool = createTool({
     query: z.string().describe("The search query"),
   }),
   execute: async ({ query }, context) => {
-    const emit = async (stage: string) => {
-      await context?.writer?.custom({
-        type: "data-tool-stage" as const,
-        data: { toolName: "web-search", stage },
-      });
-    };
+    const emit = createEmit(context, "web-search");
 
     await emit(`Searching: ${query}`);
     const response = await getTavily().search(query, {
@@ -38,10 +34,6 @@ export const webSearchTool = createTool({
     }));
 
     await emit(`Found ${response.results.length} results`);
-    return {
-      query,
-      answer: response.answer,
-      sources,
-    };
+    return { query, answer: response.answer, sources };
   },
 });

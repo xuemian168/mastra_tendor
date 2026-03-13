@@ -2,12 +2,12 @@ import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 import { generalAnalystAgent } from "../agents/general-analyst.agent.js";
 import { generalAnalysisOutputSchema } from "../schemas/general-analysis.schema.js";
-import { buildTenderPrompt, buildRagPrompt } from "../utils/prompt.js";
-import { tokenTracker } from "../utils/token-tracker.js";
-import { vectorStore } from "../rag/in-memory-vector-store.js";
-import { retrieveForAgent } from "../rag/retriever.js";
-import { embedQuery } from "../rag/embedder.js";
-import { documentCache } from "../rag/document-cache.js";
+import {
+  createEmit,
+  withTokenTracking,
+  recordUsage,
+  resolveDocumentPrompt,
+} from "./tool-helpers.js";
 
 export const analyzeDocumentTool = createTool({
   id: "analyze-document",
@@ -21,54 +21,25 @@ export const analyzeDocumentTool = createTool({
     fullText: z.string().optional().describe("DEPRECATED: Do not pass. The system retrieves document text automatically by indexName."),
   }),
   execute: async (inputData, context) => {
-    const emit = async (stage: string) => {
-      await context?.writer?.custom({
-        type: "data-tool-stage" as const,
-        data: { toolName: "analyze-document", stage },
-      });
-    };
+    const emit = createEmit(context, "analyze-document");
 
-    tokenTracker.startStep("analyze-document-tool");
-    try {
+    return withTokenTracking("analyze-document-tool", async () => {
       const task = `Analyze the following document. Analysis goal: ${inputData.analysisGoal}`;
-      let prompt: string;
-
-      const cached = documentCache.get(inputData.indexName);
-      const fullText = inputData.fullText ?? cached?.fullText;
-      const docTitle = inputData.documentTitle ?? cached?.documentTitle;
-
-      if (fullText) {
-        await emit("Using cached full text");
-        prompt = buildTenderPrompt(task, fullText, docTitle);
-      } else {
-        await emit("Retrieved relevant chunks");
-        const chunks = await retrieveForAgent(
-          vectorStore,
-          inputData.indexName,
-          { queries: [inputData.analysisGoal], topK: 8 },
-          embedQuery,
-        );
-        prompt = buildRagPrompt(task, chunks, docTitle);
-      }
+      const prompt = await resolveDocumentPrompt(
+        task,
+        inputData.indexName,
+        { queries: [inputData.analysisGoal], topK: 8 },
+        inputData,
+      );
 
       await emit(`Analyzing document: ${inputData.analysisGoal}`);
       const result = await generalAnalystAgent.generate(prompt, {
         structuredOutput: { schema: generalAnalysisOutputSchema },
       });
-
-      if (result.usage) {
-        tokenTracker.record("analyze-document-tool", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
-      }
+      recordUsage("analyze-document-tool", result.usage);
 
       await emit("Generated analysis report");
-      tokenTracker.completeStep("analyze-document-tool");
       return result.object;
-    } catch (error) {
-      tokenTracker.completeStep("analyze-document-tool");
-      return {
-        error: true,
-        message: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
-      };
-    }
+    });
   },
 });

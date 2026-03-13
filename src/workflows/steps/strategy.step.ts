@@ -7,6 +7,7 @@ import {
 } from "../../schemas/index.js";
 import { strategyAgent } from "../../agents/index.js";
 import { tokenTracker } from "../../utils/token-tracker.js";
+import { buildStrategyPrompt } from "../../utils/prompt.js";
 import { historyStore } from "../../rag/history-store.js";
 import { embedQuery } from "../../rag/embedder.js";
 
@@ -25,27 +26,21 @@ export const strategyStep = createStep({
     const risk = inputData["risk-step"];
     const initData = getInitData() as { companyProfile?: string } | undefined;
 
-    let prompt = `Based on the following analyses, provide a Bid/No-Bid recommendation.
-
-## Compliance Analysis
-- Technical Specs: ${compliance.technicalSpecs.join("; ") || "None"}
-- Deadlines: ${compliance.deadlines.join("; ") || "None"}
-- Mandatory Requirements: ${compliance.mandatoryRequirements.join("; ") || "None"}
-- Qualifications: ${compliance.qualifications.join("; ") || "None"}
-- Summary: ${compliance.summary}
-
-## Risk Analysis
-- Overall Risk Level: ${risk.overallRiskLevel}
-- Technical Complexity: ${risk.difficultyAssessment.technicalComplexity}
-- Resource Requirements: ${risk.difficultyAssessment.resourceRequirements}
-- Timeline Feasibility: ${risk.difficultyAssessment.timelineFeasibility}
-- Penalty Clauses: ${risk.penaltyClauses.join("; ") || "None"}
-- Delivery Risks: ${risk.deliveryRisks.join("; ") || "None"}
-- Summary: ${risk.summary}`;
-
-    if (initData?.companyProfile) {
-      prompt += `\n\n## Company Profile\n${initData.companyProfile}`;
-    }
+    let prompt = buildStrategyPrompt({
+      complianceSummary: compliance.summary,
+      technicalSpecs: compliance.technicalSpecs,
+      deadlines: compliance.deadlines,
+      mandatoryRequirements: compliance.mandatoryRequirements,
+      qualifications: compliance.qualifications,
+      overallRiskLevel: risk.overallRiskLevel,
+      technicalComplexity: risk.difficultyAssessment.technicalComplexity,
+      resourceRequirements: risk.difficultyAssessment.resourceRequirements,
+      timelineFeasibility: risk.difficultyAssessment.timelineFeasibility,
+      penaltyClauses: risk.penaltyClauses,
+      deliveryRisks: risk.deliveryRisks,
+      riskSummary: risk.summary,
+      companyProfile: initData?.companyProfile,
+    });
 
     try {
       const historicalCases = await historyStore.findSimilar(

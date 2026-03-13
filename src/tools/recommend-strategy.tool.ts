@@ -2,9 +2,10 @@ import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 import { strategyAgent } from "../agents/strategy.agent.js";
 import { strategyOutputSchema } from "../schemas/strategy.schema.js";
-import { tokenTracker } from "../utils/token-tracker.js";
 import { historyStore } from "../rag/history-store.js";
 import { embedQuery } from "../rag/embedder.js";
+import { buildStrategyPrompt } from "../utils/prompt.js";
+import { createEmit, withTokenTracking, recordUsage } from "./tool-helpers.js";
 
 export const recommendStrategyTool = createTool({
   id: "recommend-strategy",
@@ -27,73 +28,37 @@ export const recommendStrategyTool = createTool({
     companyProfile: z.string().optional().describe("Optional company profile for context"),
   }),
   execute: async (inputData, context) => {
-    const emit = async (stage: string) => {
-      await context?.writer?.custom({
-        type: "data-tool-stage" as const,
-        data: { toolName: "recommend-strategy", stage },
-      });
-    };
+    const emit = createEmit(context, "recommend-strategy");
 
-    tokenTracker.startStep("strategy-tool");
-    await emit("Compiling compliance and risk data");
-    let prompt = `Based on the following analyses, provide a Bid/No-Bid recommendation.
+    return withTokenTracking("strategy-tool", async () => {
+      await emit("Compiling compliance and risk data");
+      let prompt = buildStrategyPrompt(inputData);
 
-## Compliance Analysis
-- Technical Specs: ${inputData.technicalSpecs.join("; ") || "None"}
-- Deadlines: ${inputData.deadlines.join("; ") || "None"}
-- Mandatory Requirements: ${inputData.mandatoryRequirements.join("; ") || "None"}
-- Qualifications: ${inputData.qualifications.join("; ") || "None"}
-- Summary: ${inputData.complianceSummary}
-
-## Risk Analysis
-- Overall Risk Level: ${inputData.overallRiskLevel}
-- Technical Complexity: ${inputData.technicalComplexity}
-- Resource Requirements: ${inputData.resourceRequirements}
-- Timeline Feasibility: ${inputData.timelineFeasibility}
-- Penalty Clauses: ${inputData.penaltyClauses.join("; ") || "None"}
-- Delivery Risks: ${inputData.deliveryRisks.join("; ") || "None"}
-- Summary: ${inputData.riskSummary}`;
-
-    if (inputData.companyProfile) {
-      prompt += `\n\n## Company Profile\n${inputData.companyProfile}`;
-    }
-
-    try {
-      const historicalCases = await historyStore.findSimilar(
-        `${inputData.complianceSummary} ${inputData.riskSummary}`,
-        embedQuery,
-      );
-      if (historicalCases.length > 0) {
-        await emit(`Found ${historicalCases.length} historical references`);
-        prompt += "\n\n## Historical Reference";
-        for (const h of historicalCases) {
-          prompt += `\n- [${h.decision}] ${h.tenderTitle} (confidence: ${h.confidenceScore}%): ${h.summary}`;
+      try {
+        const historicalCases = await historyStore.findSimilar(
+          `${inputData.complianceSummary} ${inputData.riskSummary}`,
+          embedQuery,
+        );
+        if (historicalCases.length > 0) {
+          await emit(`Found ${historicalCases.length} historical references`);
+          prompt += "\n\n## Historical Reference";
+          for (const h of historicalCases) {
+            prompt += `\n- [${h.decision}] ${h.tenderTitle} (confidence: ${h.confidenceScore}%): ${h.summary}`;
+          }
+        } else {
+          await emit("No historical references found");
         }
-      } else {
-        await emit("No historical references found");
+      } catch {
+        // History retrieval is best-effort
       }
-    } catch {
-      // History retrieval is best-effort
-    }
 
-    try {
       await emit("Synthesizing Bid/No-Bid recommendation");
       const result = await strategyAgent.generate(prompt, {
         structuredOutput: { schema: strategyOutputSchema },
       });
+      recordUsage("strategy-tool", result.usage);
 
-      if (result.usage) {
-        tokenTracker.record("strategy-tool", result.usage.inputTokens ?? 0, result.usage.outputTokens ?? 0);
-      }
-
-      tokenTracker.completeStep("strategy-tool");
       return result.object;
-    } catch (error) {
-      tokenTracker.completeStep("strategy-tool");
-      return {
-        error: true,
-        message: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
-      };
-    }
+    });
   },
 });
